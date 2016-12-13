@@ -87,7 +87,7 @@ module.exports = function (bot) {
     // });
 
     function escape(text) {
-        return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+        return text.replace(/[-[\]{}()*+?,\\^$|#\s]/g, "\\$&");
     };
 
     function quoteFromGroup(chatId, group_id, search) {
