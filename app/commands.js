@@ -103,7 +103,7 @@ module.exports = function (bot) {
 
     };
 
-    bot.onText(/\/quote($| (.+))/, function (msg, match) {
+    bot.onText(/\/quote( (.+)|$)/, function (msg, match) {
         var chatId = msg.chat.id;
 
 
