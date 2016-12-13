@@ -93,6 +93,7 @@ module.exports = function (bot) {
         var re = new RegExp(escape(search), "i");
 
         db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
+            console.log(quote)
             if (quote[0]) {
                 bot.sendMessage(chatId, quote[0].quote);
             }
@@ -128,7 +129,7 @@ module.exports = function (bot) {
             arr.lastRequestBy = msg.from.id;
             arr.save(function (err) {
                 if (err) throw err;
-                console.log('!');
+                // console.log('!');
             });
         });
     });
