@@ -1,0 +1,19 @@
+{
+  "name": "telegram_quote_bot",
+  "version": "0.0.1",
+  "description": "A new version of puppy for a new generation.",
+  "author": "Julkku",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "dotenv": "*" ,
+    "node-cron": "*",
+    "node-telegram-bot-api": "*",
+    "fs": "*",
+    "mongoose": "*",
+    "mongoose-simple-random": "*"
+
+ }
+}
+
