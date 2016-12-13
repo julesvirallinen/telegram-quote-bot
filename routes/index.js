@@ -1,10 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-var mongoose = require('mongoose');
-
-var url = process.env.MONGOLAB_URL || 'mongodb://localhost/quotes';
-mongoose.connect(url);
 var db = require('../app/quotes');
 
 /* GET home page. */
