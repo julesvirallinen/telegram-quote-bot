@@ -62,10 +62,10 @@ module.exports = function (bot) {
             newQuote.save(function (err, quote) {
                 if (quote) {
                     // quoteId = quote._id;
-                    // bot.sendMessage(chatId, "Saved quote: " + quote.quote);
+                    bot.sendMessage(chatId, "Saved quote: " + quote.quote);
                 } else {
                     console.log(err)
-                    // bot.sendMessage(chatId, "lol no");
+                    bot.sendMessage(chatId, "lol no");
 
                 }
             });
