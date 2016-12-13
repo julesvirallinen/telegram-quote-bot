@@ -24,5 +24,5 @@ mongoose.connect(url);
 
 
 require('./app/commands')(bot);
-require('./bin/www');
+// require('./bin/www');
 
