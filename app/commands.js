@@ -48,6 +48,9 @@ module.exports = function (bot) {
         var quoteId = 0;
 
         db.Group.findOne({chatId: chatId}, function (err, group) {
+            if(!group){
+                return;
+            }
             groupId = group._id;
 
             var newQuote = db.Quote({
@@ -76,11 +79,11 @@ module.exports = function (bot) {
         addToGroup(msg.from.id, chatId, match[1]);
     });
 
-    bot.onText(/\/addtox (.+)/, function (msg, match) {
-        // addGroup(process.env.IKEA);
-        console.log("message to ikea", match[1])
-        addToGroup(-1, process.env.IKEA, match[1]);
-    });
+    // bot.onText(/\/addquote (.+)/, function (msg, match) {
+    //     // addGroup(process.env.IKEA);
+    //     console.log("message to ikea", match[1])
+    //     addToGroup(-1, process.env.IKEA, match[1]);
+    // });
 
     function escape(text) {
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -106,11 +109,11 @@ module.exports = function (bot) {
 
 
             var d = new Date();
-            if (Math.abs(arr.lastQuote - d.getTime()) < 10000) {
+            if (Math.abs(arr.lastQuote - d.getTime()) < 20000) {
                 console.log("blocked for spam!")
                 if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
                     console.log("blocked for spam from person");
-                    // return;
+                    return;
                 }
             }
 
