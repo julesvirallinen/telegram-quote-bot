@@ -48,6 +48,9 @@ module.exports = function (bot) {
         var quoteId = 0;
 
         db.Group.findOne({chatId: chatId}, function (err, group) {
+            if(!group){
+                return;
+            }
             groupId = group._id;
 
             var newQuote = db.Quote({
@@ -59,10 +62,10 @@ module.exports = function (bot) {
             newQuote.save(function (err, quote) {
                 if (quote) {
                     // quoteId = quote._id;
-                    // bot.sendMessage(chatId, "Saved quote: " + quote.quote);
+                    bot.sendMessage(chatId, "Saved quote: " + quote.quote);
                 } else {
                     console.log(err)
-                    // bot.sendMessage(chatId, "lol no");
+                    bot.sendMessage(chatId, "lol no");
 
                 }
             });
@@ -76,11 +79,11 @@ module.exports = function (bot) {
         addToGroup(msg.from.id, chatId, match[1]);
     });
 
-    bot.onText(/\/addtox (.+)/, function (msg, match) {
-        // addGroup(process.env.IKEA);
-        console.log("message to ikea", match[1])
-        addToGroup(-1, process.env.IKEA, match[1]);
-    });
+    // bot.onText(/\/addquote (.+)/, function (msg, match) {
+    //     // addGroup(process.env.IKEA);
+    //     console.log("message to ikea", match[1])
+    //     addToGroup(-1, process.env.IKEA, match[1]);
+    // });
 
     function escape(text) {
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -110,7 +113,7 @@ module.exports = function (bot) {
                 console.log("blocked for spam!")
                 if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
                     console.log("blocked for spam from person");
-                    // return;
+                    return;
                 }
             }
 
