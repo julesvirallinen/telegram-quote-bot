@@ -90,7 +90,8 @@ module.exports = function (bot) {
     };
 
     function quoteFromGroup(chatId, group_id, search) {
-        var re = new RegExp(search, "i");
+        var re = new RegExp(escape(search), "i");
+        console.log("regex ", re)
 
         db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
             console.log(quote)
