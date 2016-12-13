@@ -109,7 +109,7 @@ module.exports = function (bot) {
 
 
             var d = new Date();
-            if (Math.abs(arr.lastQuote - d.getTime()) < 20000) {
+            if (Math.abs(arr.lastQuote - d.getTime()) < 10000) {
                 console.log("blocked for spam!")
                 if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
                     console.log("blocked for spam from person");
