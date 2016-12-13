@@ -3,13 +3,6 @@
  */
 
 module.exports = function (bot) {
-    var mongoose = require('mongoose');
-
-    var url = process.env.MONGOLAB_URL || 'mongodb://localhost/quotes';
-    mongoose.connect(url);
-
-    // mongoose.connect('mongodb://localhost/quotes');
-
     var db = require('./quotes');
 
 
