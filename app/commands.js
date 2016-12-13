@@ -76,7 +76,8 @@ module.exports = function (bot) {
 
     bot.onText(/\/(add(\@puppy2_bot)?) (.+)/, function (msg, match) {
         var chatId = msg.chat.id;
-        addToGroup(msg.from.id, chatId, match[1]);
+        console.log(match)
+        addToGroup(msg.from.id, chatId, match[3]);
     });
 
     // bot.onText(/\/addquote (.+)/, function (msg, match) {
@@ -120,11 +121,11 @@ module.exports = function (bot) {
                 }
             }
 
-            if (match[1] == undefined) {
+            if (match[4] == undefined) {
                 quoteFromGroup(chatId, arr._id, '.');
             } else {
-                console.log("searching for: " + match[1])
-                quoteFromGroup(chatId, arr._id, match[1]);
+                console.log("searching for: " + match[4])
+                quoteFromGroup(chatId, arr._id, match[4]);
             }
 
             arr.lastQuote = d.getTime();
