@@ -48,7 +48,7 @@ module.exports = function (bot) {
         var quoteId = 0;
 
         db.Group.findOne({chatId: chatId}, function (err, group) {
-            if(!group){
+            if (!group) {
                 return;
             }
             groupId = group._id;
@@ -104,38 +104,58 @@ module.exports = function (bot) {
 
     };
 
-    bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
+    bot.onText(/\/(sleep(\@puppy2_bot)?)/, function (msg, match) {
         var chatId = msg.chat.id;
-        console.log(msg)
 
         db.Group.findOne({chatId: chatId}, function (err, arr) {
-
-
             var d = new Date();
-            if (Math.abs(arr.lastQuote - d.getTime()) < 20000) {
-                console.log("blocked for spam!")
+            if (d.getTime() - arr.lastQuote < 20000) {
+                console.log("Already asleep! Time left: " + (-(d.getTime()-arr.lastQuote)/1000));
                 return;
-                if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
-                    console.log("blocked for spam from person");
-                    return;
-                }
             }
-
-            if (match[4] == undefined) {
-                quoteFromGroup(chatId, arr._id, '.');
-            } else {
-                console.log("searching for: " + match[4])
-                quoteFromGroup(chatId, arr._id, match[4]);
-            }
-
-            arr.lastQuote = d.getTime();
-            arr.lastRequestBy = msg.from.id;
+                arr.lastQuote = d.getTime() + 200000;
             arr.save(function (err) {
                 if (err) throw err;
-                // console.log('!');
+                console.log("sleeping for 200 seconds");
+                bot.sendMessage(msg.chat.id, "ok, ,___, ");
+
             });
         });
     });
 
-};
+
+bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
+    var chatId = msg.chat.id;
+
+    db.Group.findOne({chatId: chatId}, function (err, arr) {
+
+
+        var d = new Date();
+        if (d.getTime() - arr.lastQuote < 20000) {
+            console.log("Blocked for spam! Time left: " + (-(d.getTime()-arr.lastQuote)/1000));
+            return;
+            if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
+                console.log("blocked for spam from person");
+                return;
+            }
+        }
+
+        if (match[4] == undefined) {
+            quoteFromGroup(chatId, arr._id, '.');
+        } else {
+            console.log("searching for: " + match[4])
+            quoteFromGroup(chatId, arr._id, match[4]);
+        }
+
+        arr.lastQuote = d.getTime();
+        arr.lastRequestBy = msg.from.id;
+        arr.save(function (err) {
+            if (err) throw err;
+            // console.log('!');
+        });
+    });
+});
+
+}
+;
 
