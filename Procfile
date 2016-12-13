@@ -1,2 +1,2 @@
 worker: node server.js
-web: npm ./bin/www
+web: node ./bin/www
