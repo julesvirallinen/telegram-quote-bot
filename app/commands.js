@@ -90,7 +90,7 @@ module.exports = function (bot) {
     };
 
     function quoteFromGroup(chatId, group_id, search) {
-        var re = new RegExp(escape(search), "i");
+        var re = new RegExp(search, "i");
 
         db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
             console.log(quote)
@@ -112,6 +112,7 @@ module.exports = function (bot) {
             var d = new Date();
             if (Math.abs(arr.lastQuote - d.getTime()) < 10000) {
                 console.log("blocked for spam!")
+                return;
                 if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
                     console.log("blocked for spam from person");
                     return;
