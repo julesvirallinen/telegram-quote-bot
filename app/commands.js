@@ -91,6 +91,8 @@ module.exports = function (bot) {
             console.log(quote);
             if (quote[0]) {
                 bot.sendMessage(chatId, quote[0].quote);
+            } else {
+                quoteFromGroup(chatId, group_id, '.');
             }
         });
 
