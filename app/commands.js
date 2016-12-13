@@ -74,7 +74,7 @@ module.exports = function (bot) {
 
     }
 
-    bot.onText(/\/add (.+)/, function (msg, match) {
+    bot.onText(/\/(add(\@puppy2_bot)?) (.+)/, function (msg, match) {
         var chatId = msg.chat.id;
         addToGroup(msg.from.id, chatId, match[1]);
     });
@@ -94,7 +94,7 @@ module.exports = function (bot) {
         console.log("regex ", re)
 
         db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
-            console.log(quote)
+            console.log(quote);
             if (quote[0]) {
                 bot.sendMessage(chatId, quote[0].quote);
             }
@@ -103,9 +103,9 @@ module.exports = function (bot) {
 
     };
 
-    bot.onText(/\/quote( (.+)|$)/, function (msg, match) {
+    bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
         var chatId = msg.chat.id;
-
+        console.log(msg)
 
         db.Group.findOne({chatId: chatId}, function (err, arr) {
 
