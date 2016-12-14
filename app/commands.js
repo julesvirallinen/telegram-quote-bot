@@ -157,6 +157,10 @@ module.exports = function (bot) {
             }
 
             if (match[4] == undefined) {
+                if (Math.random() < 0.005) {
+                    sentTotallyRandom(chatId);
+                    return;
+                }
                 getQuoteForGroup(chatId, arr._id, '.');
             } else {
                 console.log("searching for: " + match[4]);
