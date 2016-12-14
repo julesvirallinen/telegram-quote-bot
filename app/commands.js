@@ -78,12 +78,12 @@ module.exports = function (bot) {
     };
 
     function sendToChat(chatId, message) {
-        console.log(message.substr(0, 5), message.substr(5,31), message.substr(36));
-
+        console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
+        var stickerId = message.split(':')[1].split(')')[0];
         if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
             try {
-                bot.sendSticker(chatId, message.substr(5, 31));
-            } catch(err) {
+                bot.sendSticker(chatId, stickerId);
+            } catch (err) {
                 console.log("invalid sticker syntax " + err)
             }
             return;
