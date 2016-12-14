@@ -95,6 +95,17 @@ module.exports = function (bot) {
 
     }
 
+    function sentTotallyRandom(chatId) {
+        db.Quote.findRandom(function (err, quote) {
+            if (quote[0]) {
+                sendToChat(chatId, quote[0].quote);
+            } else {
+                getQuoteForGroup(chatId, group_id, '.');
+            }
+        });
+
+    }
+
     bot.onText(/\/start/, function (msg, match) {
         var chatId = msg.chat.id;
 
@@ -129,7 +140,6 @@ module.exports = function (bot) {
         });
     });
 
-
     bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
         var chatId = msg.chat.id;
 
@@ -140,10 +150,10 @@ module.exports = function (bot) {
             if (d.getTime() - arr.lastQuote < 20000) {
                 console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
                 return;
-                if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
-                    console.log("blocked for spam from person");
-                    return;
-                }
+                // if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
+                //     console.log("blocked for spam from person");
+                //     return;
+                // }
             }
 
             if (match[4] == undefined) {
@@ -152,6 +162,32 @@ module.exports = function (bot) {
                 console.log("searching for: " + match[4]);
                 getQuoteForGroup(chatId, arr._id, match[4]);
             }
+
+            arr.lastQuote = d.getTime();
+            arr.lastRequestBy = msg.from.id;
+            arr.save(function (err) {
+                if (err) throw err;
+                // console.log('!');
+            });
+        });
+    });
+
+    bot.onText(/\/(imfeelinglucky(\@puppy2_bot)?)/, function (msg, match) {
+        var chatId = msg.chat.id;
+
+        db.Group.findOne({chatId: chatId}, function (err, arr) {
+
+
+            var d = new Date();
+            if (d.getTime() - arr.lastQuote < 10000) {
+                console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
+                return;
+                // if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
+                //     console.log("blocked for spam from person");
+                //     return;
+                // }
+            }
+            sentTotallyRandom(chatId);
 
             arr.lastQuote = d.getTime();
             arr.lastRequestBy = msg.from.id;
