@@ -85,8 +85,9 @@ module.exports = function (bot) {
                 bot.sendSticker(chatId, stickerId);
             } catch (err) {
                 console.log("invalid sticker syntax " + err)
+            } finally {
+                return;
             }
-            return;
         }
 
         bot.sendMessage(chatId, message);
