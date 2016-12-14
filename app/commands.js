@@ -79,8 +79,9 @@ module.exports = function (bot) {
 
     function sendToChat(chatId, message) {
         console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
-        var stickerId = message.split(':')[1].split('(')[0];
         if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
+            var stickerId = message.split(':')[1].split('(')[0];
+
             try {
                 bot.sendSticker(chatId, stickerId);
             } catch (err) {
