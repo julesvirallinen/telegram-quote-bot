@@ -25,7 +25,7 @@ module.exports = function (bot) {
         var groupId = 0;
         var quoteId = 0;
 
-        db.Group.findOne({chatId: chatId}, function (err, group) {
+        db.Group.findOne({ chatId: chatId }, function (err, group) {
             if (!group) {
                 return;
             }
@@ -40,7 +40,7 @@ module.exports = function (bot) {
             newQuote.save(function (err, quote) {
                 if (quote) {
                     // quoteId = quote._id;
-                    bot.sendMessage(chatId, "Saved quote: " + quote.quote);
+                    bot.sendMessage(chatId, "Saved quote: " + quote.quote, quote._id);
                 } else {
                     console.log(err)
                     bot.sendMessage(chatId, "lol no");
@@ -52,11 +52,6 @@ module.exports = function (bot) {
 
     }
 
-    // bot.onText(/\/addquote (.+)/, function (msg, match) {
-    //     // addGroup(process.env.IKEA);
-    //     console.log("message to ikea", match[1])
-    //     addToGroup(-1, process.env.IKEA, match[1]);
-    // });
 
     function escape(text) {
         return text.replace(/[-[\]{}()*+?,\\^$|#\s]/g, "\\$&");
@@ -66,10 +61,10 @@ module.exports = function (bot) {
         var re = new RegExp(escape(search.trim()), "i");
         console.log("regex ", re);
 
-        db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
+        db.Quote.findRandom({ group: group_id, quote: re }, function (err, quote) {
             // console.log(quote);
             if (quote[0]) {
-                sendToChat(chatId, quote[0].quote);
+                sendToChat(chatId, quote[0].quote, quote[0]._id);
                 // bot.sendMessage(chatId, quote[0].quote);
             } else {
                 getQuoteForGroup(chatId, group_id, '.');
@@ -77,7 +72,7 @@ module.exports = function (bot) {
         });
     };
 
-    function sendToChat(chatId, message) {
+    function sendToChat(chatId, message, quoteId) {
         console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
         if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
             var stickerId = message.split(':')[1].split('(')[0];
@@ -90,10 +85,56 @@ module.exports = function (bot) {
                 return;
             }
         }
+        if (quoteId) {
+            var options = {
+                reply_markup: JSON.stringify({
+                    inline_keyboard: [[
+                        { text: '😑', callback_data: '+|'+quoteId },
+                        { text: "😀", callback_data: '-|'+quoteId },
+                        { text: "❌", callback_data: '0' }
+                    ]]
+                })
+            };
+            bot.sendMessage(chatId, message, options);
+            return;
+        }
 
         bot.sendMessage(chatId, message);
 
     }
+
+    bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+
+
+    var parts = callbackQuery.data.split('|');
+    var options = {
+        chat_id: callbackQuery.message.chat.id,
+        message_id: callbackQuery.message.message_id
+    };
+
+    if (parts[0] == '+' || parts[0] == '-') {
+                db.Quote.find({ _id:parts[1]}, function (err, quote) {
+                    console.log(quote);
+            if (quote[0]) {
+                var rating = 1;
+                rating = quote[0].rating;
+                if(parts[0] == '+')
+
+                sendToChat(chatId, quote[0].quote, quote[0]._id);
+                // bot.sendMessage(chatId, quote[0].quote);
+            }
+        });
+
+
+
+
+        bot.editMessageText('Rated ' + value, options);
+    }
+    else bot.editMessageText('Ok then, have a good day!', options);
+
+
+});
+
 
     function sentTotallyRandom(chatId) {
         db.Quote.findRandom(function (err, quote) {
@@ -109,7 +150,7 @@ module.exports = function (bot) {
     bot.onText(/\/start/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({chatId: chatId}, function (err, group) {
+        db.Group.findOne({ chatId: chatId }, function (err, group) {
             if (!group) {
 
                 addGroup(chatId);
@@ -124,7 +165,7 @@ module.exports = function (bot) {
     bot.onText(/\/(sleep(\@puppy2_bot)?)/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({chatId: chatId}, function (err, arr) {
+        db.Group.findOne({ chatId: chatId }, function (err, arr) {
             var d = new Date();
             if (d.getTime() - arr.lastQuote < 20000) {
                 console.log("Already asleep! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
@@ -143,7 +184,7 @@ module.exports = function (bot) {
     bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({chatId: chatId}, function (err, arr) {
+        db.Group.findOne({ chatId: chatId }, function (err, arr) {
 
 
             var d = new Date();
@@ -179,7 +220,7 @@ module.exports = function (bot) {
     bot.onText(/\/(imfeelinglucky(\@puppy2_bot)?)/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({chatId: chatId}, function (err, arr) {
+        db.Group.findOne({ chatId: chatId }, function (err, arr) {
 
 
             var d = new Date();
@@ -209,6 +250,7 @@ module.exports = function (bot) {
     });
 
 
+
 }
-;
+    ;
 

@@ -10,7 +10,8 @@ var quotesSchema = new Schema({
     quote: String,
     index: Number,
     // addedBy: {type: Schema.ObjectId, ref: 'User'},
-    group: {type: Schema.ObjectId, ref: 'Group'}
+    group: {type: Schema.ObjectId, ref: 'Group',
+    rating: {type:Number, default:1}}
 });
 
 var groupsSchema = new Schema({
