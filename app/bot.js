@@ -43,7 +43,7 @@ module.exports = function (bot) {
                     // quoteId = quote._id;
                     bot.sendMessage(chatId, "Saved quote: " + quote.quote, quote._id);
                 } else {
-                    console.log(err)
+                    console.log(err);
                     bot.sendMessage(chatId, "lol no");
 
                 }
@@ -56,8 +56,7 @@ module.exports = function (bot) {
 
     function escape(text) {
         return text.replace(/[-[\]{}()*+?,\\^$|#\s]/g, "\\$&");
-    };
-
+    }
     function getQuoteForGroup(chatId, group_id, search) {
         var re = new RegExp(escape(search.trim()), "i");
         console.log("regex ", re);
@@ -71,8 +70,7 @@ module.exports = function (bot) {
                 getQuoteForGroup(chatId, group_id, '.');
             }
         });
-    };
-
+    }
     function sendToChat(chatId, message, quoteId) {
         console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
         if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
@@ -99,8 +97,11 @@ module.exports = function (bot) {
         //     bot.sendMessage(chatId, message, options);
         //     return;
         // }
+        var options = {
+            parse_mode: "Markdown"
+        };
 
-        bot.sendMessage(chatId, message);
+        bot.sendMessage(chatId, message, options);
 
     }
 
@@ -242,7 +243,7 @@ module.exports = function (bot) {
 
     bot.onText(/\/(add(\@puppy2_bot)?) (.+)/, function (msg, match) {
         var chatId = msg.chat.id;
-        console.log(match)
+        console.log(match);
         addToGroup(msg.from.id, chatId, match[3]);
     });
 
