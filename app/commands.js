@@ -86,46 +86,31 @@ module.exports = function (bot) {
                 return;
             }
         }
-        if (quoteId) {
-            var options = {
-                reply_markup: JSON.stringify({
-                    inline_keyboard: [[
-                        {text: '😀', callback_data: '+|' + quoteId},
-                        {text: "😑", callback_data: '-|' + quoteId},
-                        {text: "❌", callback_data: '0'}
-                    ]]
-                })
-            };
-            bot.sendMessage(chatId, message, options);
-            return;
-        }
+        // if (quoteId) {
+        //     var options = {
+        //         reply_markup: JSON.stringify({
+        //             inline_keyboard: [[
+        //                 {text: '😀', callback_data: '+|' + quoteId},
+        //                 {text: "😑", callback_data: '-|' + quoteId},
+        //                 {text: "❌", callback_data: '0'}
+        //             ]]
+        //         })
+        //     };
+        //     bot.sendMessage(chatId, message, options);
+        //     return;
+        // }
 
         bot.sendMessage(chatId, message);
 
     }
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
-        console.log(callbackQuery)
-
-        var parts = callbackQuery.data.split('|');
-        var options = {
-            chat_id: callbackQuery.message.chat.id,
-            message_id: callbackQuery.message.message_id
-        };
-
         if (parts[0] == '+' || parts[0] == '-') {
             db.Quote.findById(parts[1], function (err, quote) {
-                console.log("quoteData ", quote);
-                console.log("ratingup ", config.rate.up, isNaN(config.rate.up));
-                console.log("quoteRating ", quote.rating, isNaN(quote.rating));
                 if (quote) {
-
-                    // var rating = 0;
                     if (quote.rating) var rating = quote.rating;
-
                     if (parts[0] == '+') rating++;
                     if (parts[0] == '-') rating--;
-                    console.log(rating);
                     quote.rating = rating;
 
                     quote.save(function (err, quote) {
@@ -134,23 +119,16 @@ module.exports = function (bot) {
                         console.log(quote);
                     });
                     bot.answerCallbackQuery(callbackQuery.id, "new rating: " + rating);
-
-                      var options = {
-                            chat_id: callbackQuery.message.chat.id,
-                            message_id: callbackQuery.message.message_id
-                    };
-                    bot.editMessageText(callbackQuery.message.text, options);
-
-                    // sendToChat(chatId, quote[0].quote, quote[0]._id);
-                    // bot.sendMessage(chatId, quote[0].quote);
                 }
             });
 
 
-            // bot.editMessageText('Rated ' + value, options);
         }
-        // else bot.editMessageText('Ok then, have a good day!', options);
-        return true;
+        var options = {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id
+        };
+        bot.editMessageText(callbackQuery.message.text, options);
 
     });
 
@@ -186,11 +164,11 @@ module.exports = function (bot) {
 
         db.Group.findOne({chatId: chatId}, function (err, arr) {
             var d = new Date();
-            if (d.getTime() - arr.lastQuote < config.spamSec*1000) {
+            if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
                 console.log("Already asleep! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
                 return;
             }
-            arr.lastQuote = d.getTime() + config.sleepTime*1000;
+            arr.lastQuote = d.getTime() + config.sleepTime * 1000;
             arr.save(function (err) {
                 if (err) throw err;
                 console.log("sleeping for 200 seconds");
@@ -207,7 +185,7 @@ module.exports = function (bot) {
 
 
             var d = new Date();
-            if (d.getTime() - arr.lastQuote < config.spamSec*1000) {
+            if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
                 console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
                 return;
                 // if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
