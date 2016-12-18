@@ -4,6 +4,7 @@
 
 module.exports = function (bot) {
     var db = require('./quotes');
+    var config = require('../config');
 
 
     function addGroup(chatId) {
@@ -25,7 +26,7 @@ module.exports = function (bot) {
         var groupId = 0;
         var quoteId = 0;
 
-        db.Group.findOne({ chatId: chatId }, function (err, group) {
+        db.Group.findOne({chatId: chatId}, function (err, group) {
             if (!group) {
                 return;
             }
@@ -61,7 +62,7 @@ module.exports = function (bot) {
         var re = new RegExp(escape(search.trim()), "i");
         console.log("regex ", re);
 
-        db.Quote.findRandom({ group: group_id, quote: re }, function (err, quote) {
+        db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
             // console.log(quote);
             if (quote[0]) {
                 sendToChat(chatId, quote[0].quote, quote[0]._id);
@@ -89,9 +90,9 @@ module.exports = function (bot) {
             var options = {
                 reply_markup: JSON.stringify({
                     inline_keyboard: [[
-                        { text: '😑', callback_data: '+|'+quoteId },
-                        { text: "😀", callback_data: '-|'+quoteId },
-                        { text: "❌", callback_data: '0' }
+                        {text: '😀', callback_data: '+|' + quoteId},
+                        {text: "😑", callback_data: '-|' + quoteId},
+                        {text: "❌", callback_data: '0'}
                     ]]
                 })
             };
@@ -104,36 +105,54 @@ module.exports = function (bot) {
     }
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
+        console.log(callbackQuery)
+
+        var parts = callbackQuery.data.split('|');
+        var options = {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id
+        };
+
+        if (parts[0] == '+' || parts[0] == '-') {
+            db.Quote.findById(parts[1], function (err, quote) {
+                console.log("quoteData ", quote);
+                console.log("ratingup ", config.rate.up, isNaN(config.rate.up));
+                console.log("quoteRating ", quote.rating, isNaN(quote.rating));
+                if (quote) {
+
+                    // var rating = 0;
+                    if (quote.rating) var rating = quote.rating;
+
+                    if (parts[0] == '+') rating = rating + config.rate.solid;
+                    if (parts[0] == '-') rating = rating * config.rate.down;
+                    console.log(rating);
+                    quote.rating = rating;
+
+                    quote.save(function (err, quote) {
+                        if (err) throw err;
+
+                        console.log(quote);
+                    });
+                    bot.answerCallbackQuery(callbackQuery.id, "new rating: " + rating);
+
+                      var options = {
+                            chat_id: callbackQuery.message.chat.id,
+                            message_id: callbackQuery.message.message_id
+                    };
+                    bot.editMessageText(callbackQuery.message.text, options);
+
+                    // sendToChat(chatId, quote[0].quote, quote[0]._id);
+                    // bot.sendMessage(chatId, quote[0].quote);
+                }
+            });
 
 
-    var parts = callbackQuery.data.split('|');
-    var options = {
-        chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id
-    };
+            // bot.editMessageText('Rated ' + value, options);
+        }
+        // else bot.editMessageText('Ok then, have a good day!', options);
+        return true;
 
-    if (parts[0] == '+' || parts[0] == '-') {
-                db.Quote.find({ _id:parts[1]}, function (err, quote) {
-                    console.log(quote);
-            if (quote[0]) {
-                var rating = 1;
-                rating = quote[0].rating;
-                if(parts[0] == '+')
-
-                sendToChat(chatId, quote[0].quote, quote[0]._id);
-                // bot.sendMessage(chatId, quote[0].quote);
-            }
-        });
-
-
-
-
-        bot.editMessageText('Rated ' + value, options);
-    }
-    else bot.editMessageText('Ok then, have a good day!', options);
-
-
-});
+    });
 
 
     function sentTotallyRandom(chatId) {
@@ -150,7 +169,7 @@ module.exports = function (bot) {
     bot.onText(/\/start/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({ chatId: chatId }, function (err, group) {
+        db.Group.findOne({chatId: chatId}, function (err, group) {
             if (!group) {
 
                 addGroup(chatId);
@@ -165,13 +184,13 @@ module.exports = function (bot) {
     bot.onText(/\/(sleep(\@puppy2_bot)?)/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({ chatId: chatId }, function (err, arr) {
+        db.Group.findOne({chatId: chatId}, function (err, arr) {
             var d = new Date();
-            if (d.getTime() - arr.lastQuote < 20000) {
+            if (d.getTime() - arr.lastQuote < config.spamSec*1000) {
                 console.log("Already asleep! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
                 return;
             }
-            arr.lastQuote = d.getTime() + 200000;
+            arr.lastQuote = d.getTime() + config.sleepTime*1000;
             arr.save(function (err) {
                 if (err) throw err;
                 console.log("sleeping for 200 seconds");
@@ -184,11 +203,11 @@ module.exports = function (bot) {
     bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({ chatId: chatId }, function (err, arr) {
+        db.Group.findOne({chatId: chatId}, function (err, arr) {
 
 
             var d = new Date();
-            if (d.getTime() - arr.lastQuote < 20000) {
+            if (d.getTime() - arr.lastQuote < config.spamSec*1000) {
                 console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
                 return;
                 // if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
@@ -220,7 +239,7 @@ module.exports = function (bot) {
     bot.onText(/\/(imfeelinglucky(\@puppy2_bot)?)/, function (msg, match) {
         var chatId = msg.chat.id;
 
-        db.Group.findOne({ chatId: chatId }, function (err, arr) {
+        db.Group.findOne({chatId: chatId}, function (err, arr) {
 
 
             var d = new Date();
@@ -250,7 +269,6 @@ module.exports = function (bot) {
     });
 
 
-
 }
-    ;
+;
 

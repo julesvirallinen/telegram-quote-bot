@@ -15,5 +15,9 @@ var config = {};
 config.rate = {};
 config.rate.up = 1.1;
 config.rate.down = 0.95;
+config.rate.solid = 0.1;
+
+config.spamSec = 20;
+config.sleepTime = 200;
 
 module.exports = config;
