@@ -123,8 +123,8 @@ module.exports = function (bot) {
                     // var rating = 0;
                     if (quote.rating) var rating = quote.rating;
 
-                    if (parts[0] == '+') rating = rating + config.rate.solid;
-                    if (parts[0] == '-') rating = rating * config.rate.down;
+                    if (parts[0] == '+') rating++;
+                    if (parts[0] == '-') rating--;
                     console.log(rating);
                     quote.rating = rating;
 
