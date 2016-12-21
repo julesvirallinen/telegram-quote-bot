@@ -5,6 +5,7 @@
 module.exports = function (bot) {
     var db = require('./quotes');
     var config = require('../config');
+    var klusteri = require('./klusteri');
 
 
     function addGroup(chatId) {
@@ -100,8 +101,16 @@ module.exports = function (bot) {
         var options = {
             parse_mode: "Markdown"
         };
+        if(message == process.env.OLLI1){
+            bot.sendMessage(chatId, process.env.OLLI2, options);
+            return
 
+        }
         bot.sendMessage(chatId, message, options);
+
+    }
+
+    function quote(msg, match){
 
     }
 
@@ -246,6 +255,15 @@ module.exports = function (bot) {
         console.log(match);
         addToGroup(msg.from.id, chatId, match[3]);
     });
+
+
+    bot.onText(/\/(klusteri(\@puppy2_bot)?)/, function (msg, match) {
+        var klusse = klusteri();
+
+        bot.sendMessage(msg.chat.id, klusse);
+    });
+
+
 
 
 }
