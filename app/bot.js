@@ -271,7 +271,7 @@ module.exports = function (bot) {
         var chatId = msg.chat.id;
 
         if (msg.reply_to_message) {
-            console.log(msg.reply_to_message)
+            console.log(msg.reply_to_message.text)
             addToGroup(msg.from.id, chatId, msg.reply_to_message.text);
             return;
         }
