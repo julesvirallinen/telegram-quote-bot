@@ -258,23 +258,33 @@ module.exports = function (bot) {
         });
     });
 
-    bot.onText(/^\/(add(\@puppy2_bot)?) (.+)/, function (msg, match) {
-        console.log(msg)
-        var chatId = msg.chat.id;
-
-        addToGroup(msg.from.id, chatId, match[3]);
-    });
-
-    bot.onText(/^\/(add(\@puppy2_bot)?)/, function (msg, match) {
+    bot.onText(/^\/(add(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
         console.log(msg)
         var chatId = msg.chat.id;
 
         if (msg.reply_to_message) {
-            console.log(msg.reply_to_message.text)
-            addToGroup(msg.from.id, chatId, msg.reply_to_message.text);
+            if (msg.reply_to_message.text) {
+                addToGroup(msg.from.id, chatId, msg.reply_to_message.text);
+                return;
+            }
+
+            if (msg.reply_to_message.sticker) {
+                var syntax = "sti!:" + msg.reply_to_message.sticker.file_id;
+                if (match[4]) {
+                    syntax += "(" + match[4] + " )";
+                }
+                addToGroup(msg.from.id, chatId, syntax);
+                return;
+            }
+        }
+
+        if (match[4] == undefined) {
             return;
         }
+
+        addToGroup(msg.from.id, chatId, match[4]);
     });
+
 
 };
 
