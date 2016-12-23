@@ -58,6 +58,7 @@ module.exports = function (bot) {
     function escape(text) {
         return text.replace(/[-[\]{}()*+?,\\^$|#\s]/g, "\\$&");
     }
+
     function getQuoteForGroup(msg, group_id, search) {
         var chatId = msg.chat.id;
         console.log(msg)
@@ -75,6 +76,7 @@ module.exports = function (bot) {
             }
         });
     }
+
     function sendToChat(msg, message, quoteId) {
         var chatId = msg.chat.id;
         console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
@@ -105,7 +107,7 @@ module.exports = function (bot) {
         var options = {
             parse_mode: "Markdown"
         };
-        if(message == process.env.OLLI1){
+        if (message == process.env.OLLI1) {
             bot.sendMessage(chatId, process.env.OLLI2, options);
             return
         }
@@ -115,7 +117,7 @@ module.exports = function (bot) {
 
     }
 
-    function quote(msg, match){
+    function quote(msg, match) {
 
     }
 
@@ -268,23 +270,12 @@ module.exports = function (bot) {
         console.log(msg)
         var chatId = msg.chat.id;
 
-        if(msg.reply_to_message){
+        if (msg.reply_to_message) {
             console.log(msg.reply_to_message)
             addToGroup(msg.from.id, chatId, msg.reply_to_message.text);
             return;
         }
     });
 
-
-    bot.onText(/\/(klusteri(\@puppy2_bot)?)/, function (msg, match) {
-        var klusse = klusteri();
-
-        bot.sendMessage(msg.chat.id, klusse);
-    });
-
-
-
-
-}
-;
+};
 
