@@ -22,7 +22,9 @@ module.exports = function (bot) {
         });
     }
 
-    function addToGroup(addedBy, chatId, toAdd) {
+    function addToGroup(addedBy, msg, toAdd) {
+        var chatId = msg.chat.id;
+
         var groupId = 0;
         var quoteId = 0;
 
@@ -41,7 +43,8 @@ module.exports = function (bot) {
             newQuote.save(function (err, quote) {
                 if (quote) {
                     // quoteId = quote._id;
-                    bot.sendMessage(chatId, "Saved quote: " + quote.quote, quote._id);
+                    // bot.sendMessage(chatId, "Saved quote: " + quote.quote, quote._id);
+                    sendToChat(msg, "Saved quote: " + quote.quote, quote._id);
                 } else {
                     console.log(err);
                     bot.sendMessage(chatId, "lol no");
@@ -264,7 +267,7 @@ module.exports = function (bot) {
 
         if (msg.reply_to_message) {
             if (msg.reply_to_message.text) {
-                addToGroup(msg.from.id, chatId, msg.reply_to_message.text);
+                addToGroup(msg.from.id, msg, msg.reply_to_message.text);
                 return;
             }
 
@@ -273,7 +276,7 @@ module.exports = function (bot) {
                 if (match[4]) {
                     syntax += "(" + match[4] + " )";
                 }
-                addToGroup(msg.from.id, chatId, syntax);
+                addToGroup(msg.from.id, msg, syntax);
                 return;
             }
         }
@@ -282,7 +285,7 @@ module.exports = function (bot) {
             return;
         }
 
-        addToGroup(msg.from.id, chatId, match[4]);
+        addToGroup(msg.from.id, msg, match[4]);
     });
 
 
