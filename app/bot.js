@@ -5,7 +5,6 @@
 module.exports = function (bot) {
     var db = require('./quotes');
     var config = require('../config');
-    var klusteri = require('./klusteri');
 
 
     function addGroup(chatId) {
