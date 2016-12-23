@@ -58,21 +58,25 @@ module.exports = function (bot) {
     function escape(text) {
         return text.replace(/[-[\]{}()*+?,\\^$|#\s]/g, "\\$&");
     }
-    function getQuoteForGroup(chatId, group_id, search) {
+    function getQuoteForGroup(msg, group_id, search) {
+        var chatId = msg.chat.id;
+        console.log(msg)
+
         var re = new RegExp(escape(search.trim()), "i");
         console.log("regex ", re);
 
         db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
             // console.log(quote);
             if (quote[0]) {
-                sendToChat(chatId, quote[0].quote, quote[0]._id);
+                sendToChat(msg, quote[0].quote, quote[0]._id);
                 // bot.sendMessage(chatId, quote[0].quote);
             } else {
-                getQuoteForGroup(chatId, group_id, '.');
+                getQuoteForGroup(msg, group_id, '.');
             }
         });
     }
-    function sendToChat(chatId, message, quoteId) {
+    function sendToChat(msg, message, quoteId) {
+        var chatId = msg.chat.id;
         console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
         if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
             var stickerId = message.split(':')[1].split('(')[0];
@@ -104,8 +108,9 @@ module.exports = function (bot) {
         if(message == process.env.OLLI1){
             bot.sendMessage(chatId, process.env.OLLI2, options);
             return
-
         }
+        message = message.replace(":user:", msg.from.first_name);
+
         bot.sendMessage(chatId, message, options);
 
     }
@@ -143,10 +148,12 @@ module.exports = function (bot) {
     });
 
 
-    function sentTotallyRandom(chatId) {
+    function sentTotallyRandom(msg) {
+        var chatId = msg.chat.id;
+
         db.Quote.findRandom(function (err, quote) {
             if (quote[0]) {
-                sendToChat(chatId, quote[0].quote);
+                sendToChat(msg, quote[0].quote);
             } else {
                 getQuoteForGroup(chatId, group_id, '.');
             }
@@ -206,13 +213,13 @@ module.exports = function (bot) {
 
             if (match[4] == undefined) {
                 if (Math.random() < 0.005) {
-                    sentTotallyRandom(chatId);
+                    sentTotallyRandom(msg);
                     return;
                 }
-                getQuoteForGroup(chatId, arr._id, '.');
+                getQuoteForGroup(msg, arr._id, '.');
             } else {
                 console.log("searching for: " + match[4]);
-                getQuoteForGroup(chatId, arr._id, match[4]);
+                getQuoteForGroup(msg, arr._id, match[4]);
             }
 
             arr.lastQuote = d.getTime();
@@ -239,7 +246,7 @@ module.exports = function (bot) {
                 //     return;
                 // }
             }
-            sentTotallyRandom(chatId);
+            sentTotallyRandom(msg);
 
             arr.lastQuote = d.getTime();
             arr.lastRequestBy = msg.from.id;
