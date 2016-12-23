@@ -258,14 +258,14 @@ module.exports = function (bot) {
         });
     });
 
-    bot.onText(/\/(add(\@puppy2_bot)?) (.+)/, function (msg, match) {
+    bot.onText(/^\/(add(\@puppy2_bot)?) (.+)/, function (msg, match) {
         console.log(msg)
         var chatId = msg.chat.id;
 
         addToGroup(msg.from.id, chatId, match[3]);
     });
 
-    bot.onText(/\/(add(\@puppy2_bot)?)/, function (msg, match) {
+    bot.onText(/^\/(add(\@puppy2_bot)?)/, function (msg, match) {
         console.log(msg)
         var chatId = msg.chat.id;
 
