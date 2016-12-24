@@ -64,7 +64,7 @@ function quote(msg, match) {
         } else {
 
             console.log("searching for: " + match[4]);
-            getQuoteForGroup(msg, arr._id, match[4].replace("[a]", ""));
+            getQuoteForGroup(msg, arr._id, match[4]);
         }
 
         // Sets time for previous quote and saves group. 
@@ -219,6 +219,7 @@ function escape(text) {
 }
 
 function getQuoteForGroup(msg, group_id, search) {
+    search = search.replace(/\[a\]/g, "").trim();
 
     var re = new RegExp(escape(search.trim()), "i");
 
