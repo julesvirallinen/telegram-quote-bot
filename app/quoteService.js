@@ -219,7 +219,7 @@ function escape(text) {
 }
 
 function getQuoteForGroup(msg, group_id, search) {
-    search = search.replace(/[a]/g, "").trim();
+    search = search.replace(/\[a\]/g, "").trim();
 
     var re = new RegExp(escape(search.trim()), "i");
 
