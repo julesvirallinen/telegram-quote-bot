@@ -7,22 +7,18 @@
     "node": "4.6.0"
   },
   "dependencies": {
-    "dotenv": "*" ,
-    "node-cron": "*",
-    "node-telegram-bot-api": "*",
-    "fs": "*",
-    "mongoose": "*",
-    "mongoose-simple-random": "*",
     "body-parser": "~1.15.2",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
+    "dotenv": "*",
     "express": "~4.14.0",
     "jade": "~1.11.0",
+    "mongoose": "*",
+    "mongoose-simple-random": "*",
     "morgan": "~1.7.0",
-    "serve-favicon": "~2.3.0",
-    "request": "*"
-
-
+    "node-cron": "*",
+    "node-telegram-bot-api": "^0.25.0",
+    "request": "*",
+    "serve-favicon": "~2.3.0"
   }
 }
-

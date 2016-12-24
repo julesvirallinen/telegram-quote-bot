@@ -22,8 +22,11 @@ var groupsSchema = new Schema({
     // quotes: [{type: Schema.ObjectId, ref: 'Quote'}],
     users: [{userId: String, lastQuote: Number}],
     lastQuote: {type: Number, default: 0},
-    lastRequestBy: {type: Number, default: 0}
-    // lastQuoteIndex: Number
+    lastRequestBy: {type: Number, default: 0},
+    config: {
+        sleepLength: Number,
+        quoteBuffer: Number
+    }
 });
 
 // var userSchema = new Schema({

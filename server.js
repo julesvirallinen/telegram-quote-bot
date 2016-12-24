@@ -4,7 +4,6 @@ require('dotenv').config();
 var http = require('http');
 var https = require('https');
 var cron = require('node-cron');
-var fs = require('fs');
 
 
 var token = process.env.API_TOKEN;
@@ -20,6 +19,6 @@ mongoose.connect(url);
 // mongoose.connect('mongodb://localhost/quotes');
 
 
-require('./app/bot')(bot);
+require('./app/quoteController')(bot);
 // require('./bin/www');
 
