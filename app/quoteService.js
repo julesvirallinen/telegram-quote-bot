@@ -29,7 +29,9 @@ function sleep(msg) {
             console.log("Already asleep! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
             return;
         }
+
         arr.lastQuote = d.getTime() + config.sleepTime * 1000;
+
         arr.save(function (err) {
             if (err) throw err;
             console.log("sleeping for 200 seconds");
@@ -42,37 +44,37 @@ function sleep(msg) {
 
 function quote(msg, match) {
     var chatId = msg.chat.id;
-
     db.Group.findOne({ chatId: chatId }, function (err, arr) {
-
 
         var d = new Date();
         if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
             console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
             return;
-            // if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
-            //     console.log("blocked for spam from person");
-            //     return;
-            // }
         }
 
+        //sometimes sends quote from entire pool of quotes. 
         if (match[4] == undefined) {
             if (Math.random() < 0.005) {
                 sentTotallyRandom(msg);
                 return;
             }
+
             getQuoteForGroup(msg, arr._id, '.');
+
         } else {
+
             console.log("searching for: " + match[4]);
-            getQuoteForGroup(msg, arr._id, match[4]);
+            getQuoteForGroup(msg, arr._id, match[4].replace("[a]", ""));
         }
 
+        // Sets time for previous quote and saves group. 
         arr.lastQuote = d.getTime();
         arr.lastRequestBy = msg.from.id;
         arr.save(function (err) {
             if (err) throw err;
             // console.log('!');
         });
+
     });
 
 }
@@ -110,7 +112,7 @@ function add(msg, match) {
 
     if (msg.reply_to_message) {
         if (msg.reply_to_message.text) {
-            addToGroup(msg.from.id, msg, msg.reply_to_message.text);
+            addQuote(msg.from.id, msg, msg.reply_to_message.text);
             return;
         }
 
@@ -119,7 +121,7 @@ function add(msg, match) {
             if (match[4]) {
                 syntax += "(" + match[4] + " )";
             }
-            addToGroup(msg.from.id, msg, syntax);
+            addQuote(msg.from.id, msg, syntax);
             return;
         }
     }
@@ -128,7 +130,7 @@ function add(msg, match) {
         return;
     }
 
-    addToGroup(msg.from.id, msg, match[4]);
+    addQuote(msg.from.id, msg, match[4]);
 
 }
 
@@ -177,7 +179,7 @@ function addGroup(chatId) {
     });
 }
 
-function addToGroup(addedBy, msg, toAdd) {
+function addQuote(addedBy, msg, toAdd) {
     var chatId = msg.chat.id;
 
     var groupId = 0;
@@ -217,26 +219,22 @@ function escape(text) {
 }
 
 function getQuoteForGroup(msg, group_id, search) {
-    var chatId = msg.chat.id;
-    console.log(msg)
 
     var re = new RegExp(escape(search.trim()), "i");
-    console.log("regex ", re);
 
     db.Quote.findRandom({ group: group_id, quote: re }, function (err, quote) {
-        // console.log(quote);
         if (quote[0]) {
             sendToChat(msg, quote[0].quote, quote[0]._id);
-            // bot.sendMessage(chatId, quote[0].quote);
         } else {
             getQuoteForGroup(msg, group_id, '.');
+            // I hope this never loops and kills everything...
         }
     });
 }
 
 function sendToChat(msg, message, quoteId) {
+    console.log(msg)
     var chatId = msg.chat.id;
-    console.log(message.substr(0, 5), message.substr(5, 31), message.substr(36));
     if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
         var stickerId = message.split(':')[1].split('(')[0];
 
@@ -248,6 +246,7 @@ function sendToChat(msg, message, quoteId) {
             return;
         }
     }
+
     // if (quoteId) {
     //     var options = {
     //         reply_markup: JSON.stringify({
@@ -264,11 +263,17 @@ function sendToChat(msg, message, quoteId) {
     var options = {
         parse_mode: "Markdown"
     };
+
     if (message == process.env.OLLI1) {
         bot.sendMessage(chatId, process.env.OLLI2, options);
         return
     }
     message = message.replace(":user:", msg.from.first_name);
+    if(msg.text && msg.text.indexOf("[a]") != -1){
+        message = message.split("");
+        message = message.join(" ");
+    }
+
 
     bot.sendMessage(chatId, message, options);
 
@@ -288,19 +293,48 @@ function sentTotallyRandom(msg) {
 
 }
 
-module.exports = {
-    addGroup: addGroup,
-    addToGroup: addToGroup,
-    escape: escape,
-    getQuoteForGroup: getQuoteForGroup,
-    sendToChat: sendToChat,
-    quote: quote,
-    sentTotallyRandom: sentTotallyRandom,
-    start: start,
-    quote: quote,
-    imfeelinglucky: imfeelinglucky,
-    add:add,
-    voteCallback:voteCallback
+function findQuote(msg, match) {
+    var chatId = msg.chat.id;
+    var re = new RegExp(escape(match[3].trim()), "i");
+
+    db.Quote.find({ quote: re }, function (err, quote) {
+        if (msg.from.id != process.env.JULIUS) {
+            return;
+        }
+        if (quote) {
+            for (var i in quote) {
+                bot.sendMessage(chatId, quote[i].quote + " " + quote[i]._id)
+            }
+        }
+    });
 }
+
+    function delQuote(msg, match) {
+        var chatId = msg.chat.id;
+        if (msg.from.id != process.env.JULIUS) {
+            return;
+        }
+        db.Quote.find({_id: match[3]}).remove().exec(function (err) {
+            if (err) {
+                bot.sendMessage(chatId, "couldn't find it")
+                return;
+            }
+            bot.sendMessage(chatId, "deleted it :P")
+        })
+    }
+
+
+
+
+    module.exports = {
+        quote: quote,
+        start: start,
+        quote: quote,
+        imfeelinglucky: imfeelinglucky,
+        add: add,
+        voteCallback: voteCallback,
+        findQuote: findQuote,
+        delQuote:delQuote
+    }
 
 

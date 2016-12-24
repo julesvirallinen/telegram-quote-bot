@@ -20,8 +20,20 @@ module.exports = function (bot) {
     });
 
     bot.onText(/^\/(add(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
-        quoteService.add(msg,match);
+        quoteService.add(msg, match);
     });
+
+
+    bot.onText(/\/(findquotes(\@puppy2_bot)?) (.+)/, function (msg, match) {
+        quoteService.findQuote(msg, match);
+    });
+
+        bot.onText(/\/(delquote(\@puppy2_bot)?) (.+)/, function (msg, match) {
+        quoteService.delQuote(msg, match);
+    });
+
+    
+
 
 
     bot.on('callback_query', function onCallbackQuery(callbackQuery) {
