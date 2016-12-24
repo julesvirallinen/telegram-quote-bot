@@ -64,7 +64,7 @@ function quote(msg, match) {
         } else {
 
             console.log("searching for: " + match[4]);
-            getQuoteForGroup(msg, arr._id, match[4].replace("[a]", ""));
+            getQuoteForGroup(msg, arr._id, match[4].replace(/[a]/g, ""));
         }
 
         // Sets time for previous quote and saves group. 
