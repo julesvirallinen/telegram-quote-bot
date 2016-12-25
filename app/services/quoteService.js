@@ -1,8 +1,8 @@
-var db = require('./quotes');
+var db = require('./../schemas');
 var TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
-var bot = new TelegramBot(process.env.API_TOKEN, { polling: true });
-var config = require('../config');
+var bot = new TelegramBot(process.env.API_TOKEN);
+var config = require('../../config');
 
 
 function start(msg) {
