@@ -42,34 +42,60 @@ function sleep(msg) {
 
 }
 
+function stats(msg) {
+    var chatId = msg.chat.id;
+    console.log("made it to stats!")
+
+    db.Group.findOne({ chatId: chatId }, function (err, arr) {
+        var d = new Date();
+        if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
+            console.log("Spam block! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
+            return;
+        }
+        bot.sendMessage(chatId, "Quotes requested: " + arr.counts.requests + ". Quotes returned: " + arr.counts.returned);
+
+    });
+
+}
+
 function quote(msg, match) {
     var chatId = msg.chat.id;
     db.Group.findOne({ chatId: chatId }, function (err, arr) {
 
+        if (!arr.counts.returned) {
+            arr.counts.returned = 0;
+            arr.counts.requests = 0;
+        }
+
         var d = new Date();
         if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
             console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
-            return;
-        }
-
-        //sometimes sends quote from entire pool of quotes. 
-        if (match[4] == undefined) {
-            if (Math.random() < 0.005) {
-                sentTotallyRandom(msg);
-                return;
-            }
-
-            getQuoteForGroup(msg, arr._id, '.');
-
         } else {
 
-            console.log("searching for: " + match[4]);
-            getQuoteForGroup(msg, arr._id, match[4]);
+            //sometimes sends quote from entire pool of quotes. 
+            if (match[4] == undefined) {
+                if (Math.random() < 0.005) {
+                    sentTotallyRandom(msg);
+                    return;
+                }
+
+                getQuoteForGroup(msg, arr._id, '.');
+
+            } else {
+
+                console.log("searching for: " + match[4]);
+                getQuoteForGroup(msg, arr._id, match[4]);
+            }
+
+            // Sets time for previous quote and saves group. 
+            arr.lastQuote = d.getTime();
+            arr.lastRequestBy = msg.from.id;
+
+            arr.counts.returned++;
+
         }
 
-        // Sets time for previous quote and saves group. 
-        arr.lastQuote = d.getTime();
-        arr.lastRequestBy = msg.from.id;
+        arr.counts.requests++;
         arr.save(function (err) {
             if (err) throw err;
             // console.log('!');
@@ -93,15 +119,20 @@ function imfeelinglucky(msg) {
             //     console.log("blocked for spam from person");
             //     return;
             // }
-        }
-        sentTotallyRandom(msg);
+        } else {
+            sentTotallyRandom(msg);
 
-        arr.lastQuote = d.getTime();
-        arr.lastRequestBy = msg.from.id;
+            arr.lastQuote = d.getTime();
+            arr.lastRequestBy = msg.from.id;
+            // arr.counts.returned = 1;
+
+        }
+        // arr.counts.requests = 1;
         arr.save(function (err) {
             if (err) throw err;
             // console.log('!');
         });
+
     });
 
 }
@@ -270,7 +301,7 @@ function sendToChat(msg, message, quoteId) {
         return
     }
     message = message.replace(":user:", msg.from.first_name);
-    if(msg.text && msg.text.indexOf("[a]") != -1){
+    if (msg.text && msg.text.indexOf("[a]") != -1) {
         message = message.split("");
         message = message.join(" ");
     }
@@ -310,32 +341,33 @@ function findQuote(msg, match) {
     });
 }
 
-    function delQuote(msg, match) {
-        var chatId = msg.chat.id;
-        if (msg.from.id != process.env.JULIUS) {
+function delQuote(msg, match) {
+    var chatId = msg.chat.id;
+    if (msg.from.id != process.env.JULIUS) {
+        return;
+    }
+    db.Quote.find({ _id: match[3] }).remove().exec(function (err) {
+        if (err) {
+            bot.sendMessage(chatId, "couldn't find it")
             return;
         }
-        db.Quote.find({_id: match[3]}).remove().exec(function (err) {
-            if (err) {
-                bot.sendMessage(chatId, "couldn't find it")
-                return;
-            }
-            bot.sendMessage(chatId, "deleted it :P")
-        })
-    }
+        bot.sendMessage(chatId, "deleted it :P")
+    })
+}
 
 
 
 
-    module.exports = {
-        quote: quote,
-        start: start,
-        quote: quote,
-        imfeelinglucky: imfeelinglucky,
-        add: add,
-        voteCallback: voteCallback,
-        findQuote: findQuote,
-        delQuote:delQuote
-    }
+module.exports = {
+    quote: quote,
+    start: start,
+    quote: quote,
+    imfeelinglucky: imfeelinglucky,
+    add: add,
+    voteCallback: voteCallback,
+    findQuote: findQuote,
+    delQuote: delQuote,
+    stats:stats
+}
 
 

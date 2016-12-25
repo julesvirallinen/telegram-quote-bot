@@ -32,6 +32,12 @@ module.exports = function (bot) {
         quoteService.delQuote(msg, match);
     });
 
+        bot.onText(/\/(stats(\@puppy2_bot)?)/, function (msg, match) {
+        quoteService.stats(msg);
+    });
+
+
+
     
 
 
