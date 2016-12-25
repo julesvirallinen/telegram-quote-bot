@@ -26,6 +26,10 @@ var groupsSchema = new Schema({
     config: {
         sleepLength: Number,
         quoteBuffer: Number
+    },
+    counts : {
+        requests: {type: Number, defaul: 0},
+        returned: {type: Number, defaul: 0}
     }
 });
 
