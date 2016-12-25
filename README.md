@@ -15,11 +15,12 @@ The bot is running as @puppy2_bot. Add it to a group and send /start to initiali
 /quote {id} - returns the quote with the matching id
 /quote - returns a random quote
 
-## Special quotes
+## Special things
 
-Add a sticker:
+Replying to any message with /add adds it as a quote. 
+This also works with stickers, use ```/add <tags to search for sticker>```
 
-´´´ /add sti!:<stickerID>(<tags or other text that will be ignored but can be searched>) ´´´
+Adding :user: to quote replaces it with the first name of whoever is asking for the quote. 
 
 Bold/markdown:
 You need to double markdown commands, because telegram will parse them in your message.
