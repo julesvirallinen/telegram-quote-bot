@@ -11,7 +11,7 @@ function start(msg) {
     db.Group.findOne({ chatId: chatId }, function (err, group) {
         if (!group) {
 
-            quoteService.addGroup(chatId);
+            addGroup(chatId);
             return;
         }
 
