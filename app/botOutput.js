@@ -2,7 +2,7 @@ var db = require('./schemas');
 var TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
 var bot = new TelegramBot(process.env.API_TOKEN);
-var config = require('../config');
+var config = require('config');
 
 var moment = require('moment');
 moment().format();
@@ -39,15 +39,7 @@ function quoteSender(msg, message, quoteId) {
         parse_mode: "Markdown"
     };
 
-    if (message == process.env.OLLI1) {
-        bot.sendMessage(chatId, process.env.OLLI2, options);
-        return
-    }
-    message = message.replace(":user:", msg.from.first_name);
-    if (msg.text && msg.text.indexOf("[a]") != -1) {
-        message = message.split("");
-        message = message.join(" ");
-    }
+    message = parseMessage(msg, message);
 
     if (quoteId) {
         var options = {
@@ -71,6 +63,23 @@ function quoteSender(msg, message, quoteId) {
 
 
 }
+
+function parseMessage(msg, message){
+    if (message == process.env.OLLI1) {
+        message = process.env.OLLI2;
+    }
+    message = message.replaceAll(":user:", msg.from.first_name);
+    if (msg.text && msg.text.indexOf("[a]") != -1) {
+        message = message.split("");
+        message = message.join(" ");
+    }
+    return message;
+}
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
 
 
 
