@@ -61,6 +61,10 @@ function stats(msg) {
 function quote(msg, match) {
     var chatId = msg.chat.id;
     db.Group.findOne({ chatId: chatId }, function (err, arr) {
+        if(!arr){
+            console.log(" quoteservice / quote(): no groups matched, terminating.")
+            return;
+        }
 
         if (!arr.counts || !arr.counts.returned) {
             arr.counts.returned = 0;
