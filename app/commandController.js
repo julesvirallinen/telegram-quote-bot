@@ -45,6 +45,10 @@ bot.onText(/\/(findquotes(\@puppy2_bot)?) (.+)/, function (msg, match) {
 });
 
 bot.onText(/\/(delid(\@puppy2_bot)?) (.+)/, function (msg, match) {
+    manageQuotes.delQuote(msg, match, true);
+});
+
+bot.onText(/\/(delquote(\@puppy2_bot)?) (.+)/, function (msg, match) {
     manageQuotes.delQuote(msg, match);
 });
 

@@ -10,8 +10,11 @@ moment().format();
 
 
 function sendMessage(msg, message){
+    var options = {
+        parse_mode: "Markdown"
+    };
 
-    bot.sendMessage(msg.chat.id, parseMessage(msg, message));
+    bot.sendMessage(msg.chat.id, parseMessage(msg, message), options);
 }
 
 function sendQuote(msg, quote, message){
@@ -25,15 +28,17 @@ function sendQuote(msg, quote, message){
 function quoteSender(msg, message, quoteId) {
     var chatId = msg.chat.id;
     if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
+        console.log(message)
         var stickerId = message.split(':')[1].split('(')[0];
 
         try {
+            console.log(stickerId)
             bot.sendSticker(chatId, stickerId);
         } catch (err) {
             console.log("invalid sticker syntax " + err)
-        } finally {
-            return;
-        }
+
+    }
+        return;
     }
 
     var options = {

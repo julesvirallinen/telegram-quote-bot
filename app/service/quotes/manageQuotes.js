@@ -69,18 +69,44 @@ function addQuote(addedBy, msg, toAdd) {
     })
 };
 
-function delQuote(msg, match) {
+function delQuote(msg, match, idBool) {
     var chatId = msg.chat.id;
     if (msg.from.id != process.env.JULIUS) {
         return;
     }
-    db.Quote.find({_id: match[3]}).remove().exec(function (err) {
-        if (err) {
-            bot.sendMessage(chatId, "couldn't find it")
-            return;
-        }
-        bot.sendMessage(chatId, "deleted it :P")
-    })
+    if (idBool) {
+        db.Quote.find({_id: match[3]}).remove().exec(function (err) {
+            if (err) {
+                botOutput.sendMessage(msg, "couldn't find it")
+                return;
+            }
+            botOutput.sendMessage(msg, "deleted it :P")
+        })
+    } else {
+
+        var re = new RegExp(match[3], "i");
+
+        db.Quote.find({quote: re}, function (err, quote) {
+            if(quote.length>1){
+                botOutput.sendMessage(msg, "found " + quote.length + " quotes, did nothing.");
+                findQuote(msg, match);
+            }
+            if(quote.length==1){
+                var text = "*deleted quote*: " + quote[0].quote;
+                db.Quote.findByIdAndRemove(quote[0]._id, function(err) {
+                    botOutput.sendMessage(msg, text);
+
+                })
+
+
+
+            } else {
+                botOutput.sendMessage(msg, "found nothing...");
+
+            }
+        });
+    }
+
 }
 
 function findQuote(msg, match) {
