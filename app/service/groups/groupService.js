@@ -1,7 +1,7 @@
 /**
  * Created by julkku on 12/27/16.
  */
-var db = require('./../schemas');
+var db = require('./../../schemas');
 require('dotenv').config();
 var config = require('../../config');
 var botOutput = require('../../botOutput');
