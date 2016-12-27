@@ -3,15 +3,16 @@ var TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
 var bot = new TelegramBot(process.env.API_TOKEN);
 var config = require('../../config');
+var botOutput = require('../botOutput');
 
 
 function start(msg) {
     var chatId = msg.chat.id;
 
-    db.Group.findOne({ chatId: chatId }, function (err, group) {
+    db.Group.findOne({chatId: chatId}, function (err, group) {
         if (!group) {
 
-            quoteService.addGroup(chatId);
+            addGroup(chatId);
             return;
         }
 
@@ -23,7 +24,7 @@ function start(msg) {
 function sleep(msg) {
     var chatId = msg.chat.id;
 
-    db.Group.findOne({ chatId: chatId }, function (err, arr) {
+    db.Group.findOne({chatId: chatId}, function (err, arr) {
         var d = new Date();
         if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
             console.log("Already asleep! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
@@ -46,7 +47,7 @@ function stats(msg) {
     var chatId = msg.chat.id;
     console.log("made it to stats!")
 
-    db.Group.findOne({ chatId: chatId }, function (err, arr) {
+    db.Group.findOne({chatId: chatId}, function (err, arr) {
         var d = new Date();
         if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
             console.log("Spam block! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
@@ -60,8 +61,8 @@ function stats(msg) {
 
 function quote(msg, match) {
     var chatId = msg.chat.id;
-    db.Group.findOne({ chatId: chatId }, function (err, arr) {
-        if(!arr){
+    db.Group.findOne({chatId: chatId}, function (err, arr) {
+        if (!arr) {
             console.log(" quoteservice / quote(): no groups matched, terminating.")
             return;
         }
@@ -72,7 +73,7 @@ function quote(msg, match) {
         }
 
         var d = new Date();
-        if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
+        if (msg.from.id != process.env.JULIUS && d.getTime() - arr.lastQuote < config.spamSec * 1000) {
             console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
         } else {
 
@@ -109,10 +110,10 @@ function quote(msg, match) {
 
 }
 
-function imfeelinglucky(msg) {
+function imFeelingLucky(msg) {
     var chatId = msg.chat.id;
 
-    db.Group.findOne({ chatId: chatId }, function (err, arr) {
+    db.Group.findOne({chatId: chatId}, function (err, arr) {
 
 
         var d = new Date();
@@ -142,7 +143,6 @@ function imfeelinglucky(msg) {
 }
 
 function add(msg, match) {
-    console.log(msg)
     var chatId = msg.chat.id;
 
     if (msg.reply_to_message) {
@@ -171,21 +171,19 @@ function add(msg, match) {
 
 function voteCallback(callbackQuery) {
     //this seems to be missing a row or two... i'll have to find it...
+    var parts = callbackQuery.data.split('|');
     if (parts[0] == '+' || parts[0] == '-') {
         db.Quote.findById(parts[1], function (err, quote) {
-            if (quote) {
-                if (quote.rating) var rating = quote.rating;
-                if (parts[0] == '+') rating++;
-                if (parts[0] == '-') rating--;
-                quote.rating = rating;
+            if (quote.votes) {
+                if (parts[0] == '+') quote.votes.upVotes++;
+                if (parts[0] == '-') quote.votes.downVotes++;
 
                 quote.save(function (err, quote) {
                     if (err) throw err;
-
-                    console.log(quote);
+                    console.log(quote.votes);
                 });
-                bot.answerCallbackQuery(callbackQuery.id, "new rating: " + rating);
-            }
+                // bot.answerCallbackQuery(callbackQuery.id, ":D");
+             }
         });
 
 
@@ -220,7 +218,7 @@ function addQuote(addedBy, msg, toAdd) {
     var groupId = 0;
     var quoteId = 0;
 
-    db.Group.findOne({ chatId: chatId }, function (err, group) {
+    db.Group.findOne({chatId: chatId}, function (err, group) {
         if (!group) {
             return;
         }
@@ -229,14 +227,18 @@ function addQuote(addedBy, msg, toAdd) {
         var newQuote = db.Quote({
             quote: toAdd,
             addedBy: addedBy,
-            group: groupId
+            group: groupId,
+            votes: {
+                upVotes: 0,
+                downVotes: 0
+            }
         });
 
         newQuote.save(function (err, quote) {
             if (quote) {
                 // quoteId = quote._id;
                 // bot.sendMessage(chatId, "Saved quote: " + quote.quote, quote._id);
-                sendToChat(msg, "Saved quote: " + quote.quote, quote._id);
+                botOutput.sendQuote(msg, quote, ":user: added quote: ");
             } else {
                 console.log(err);
                 bot.sendMessage(chatId, "lol no");
@@ -258,61 +260,14 @@ function getQuoteForGroup(msg, group_id, search) {
 
     var re = new RegExp(escape(search.trim()), "i");
 
-    db.Quote.findRandom({ group: group_id, quote: re }, function (err, quote) {
+    db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
         if (quote[0]) {
-            sendToChat(msg, quote[0].quote, quote[0]._id);
+            botOutput.sendQuote(msg, quote[0]);
         } else {
             getQuoteForGroup(msg, group_id, '.');
             // I hope this never loops and kills everything...
         }
     });
-}
-
-function sendToChat(msg, message, quoteId) {
-    console.log(msg)
-    var chatId = msg.chat.id;
-    if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
-        var stickerId = message.split(':')[1].split('(')[0];
-
-        try {
-            bot.sendSticker(chatId, stickerId);
-        } catch (err) {
-            console.log("invalid sticker syntax " + err)
-        } finally {
-            return;
-        }
-    }
-
-    // if (quoteId) {
-    //     var options = {
-    //         reply_markup: JSON.stringify({
-    //             inline_keyboard: [[
-    //                 {text: '😀', callback_data: '+|' + quoteId},
-    //                 {text: "😑", callback_data: '-|' + quoteId},
-    //                 {text: "❌", callback_data: '0'}
-    //             ]]
-    //         })
-    //     };
-    //     bot.sendMessage(chatId, message, options);
-    //     return;
-    // }
-    var options = {
-        parse_mode: "Markdown"
-    };
-
-    if (message == process.env.OLLI1) {
-        bot.sendMessage(chatId, process.env.OLLI2, options);
-        return
-    }
-    message = message.replace(":user:", msg.from.first_name);
-    if (msg.text && msg.text.indexOf("[a]") != -1) {
-        message = message.split("");
-        message = message.join(" ");
-    }
-
-
-    bot.sendMessage(chatId, message, options);
-
 }
 
 
@@ -321,9 +276,7 @@ function sentTotallyRandom(msg) {
 
     db.Quote.findRandom(function (err, quote) {
         if (quote[0]) {
-            sendToChat(msg, quote[0].quote);
-        } else {
-            getQuoteForGroup(chatId, group_id, '.');
+            botOutput.sendQuote(msg, quote[0]);
         }
     });
 
@@ -333,7 +286,7 @@ function findQuote(msg, match) {
     var chatId = msg.chat.id;
     var re = new RegExp(escape(match[3].trim()), "i");
 
-    db.Quote.find({ quote: re }, function (err, quote) {
+    db.Quote.find({quote: re}, function (err, quote) {
         if (msg.from.id != process.env.JULIUS) {
             return;
         }
@@ -350,7 +303,7 @@ function delQuote(msg, match) {
     if (msg.from.id != process.env.JULIUS) {
         return;
     }
-    db.Quote.find({ _id: match[3] }).remove().exec(function (err) {
+    db.Quote.find({_id: match[3]}).remove().exec(function (err) {
         if (err) {
             bot.sendMessage(chatId, "couldn't find it")
             return;
@@ -360,18 +313,16 @@ function delQuote(msg, match) {
 }
 
 
-
-
 module.exports = {
     quote: quote,
     start: start,
     quote: quote,
-    imfeelinglucky: imfeelinglucky,
+    imFeelingLucky: imFeelingLucky,
     add: add,
     voteCallback: voteCallback,
     findQuote: findQuote,
     delQuote: delQuote,
-    stats:stats
+    stats: stats
 }
 
 

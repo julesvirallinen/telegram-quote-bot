@@ -11,9 +11,13 @@ var quotesSchema = new Schema({
     index: Number,
     // addedBy: {type: Schema.ObjectId, ref: 'User'},
     group: {
-        type: Schema.ObjectId, ref: 'Group',
+        type: Schema.ObjectId, ref: 'Group'
     },
-    rating: {type: Number, default: 1}
+    rating: {type: Number, default: 1},
+    votes : {
+        upVotes: {type:Number, default: 0},
+        downVotes: {type:Number, default: 0}
+    }
 
 });
 
@@ -28,8 +32,8 @@ var groupsSchema = new Schema({
         quoteBuffer: Number
     },
     counts : {
-        requests: {type: Number, defaul: 0},
-        returned: {type: Number, defaul: 0}
+        requests: {type: Number, default: 0},
+        returned: {type: Number, default: 0}
     }
 });
 
