@@ -3,8 +3,8 @@ var TelegramBot = require('node-telegram-bot-api');
 var token = process.env.API_TOKEN;
 var bot = new TelegramBot(token, {polling: true});
 
-var quoteService = require('./services/quoteService');
-var rollService = require('./services/rollService');
+var quoteService = require('./service/quoteService');
+var rollService = require('./service/rollService');
 
 
 bot.onText(/\/start/, function (msg, match) {

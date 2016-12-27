@@ -62,7 +62,7 @@ function quote(msg, match) {
     var chatId = msg.chat.id;
     db.Group.findOne({ chatId: chatId }, function (err, arr) {
 
-        if (!arr.counts.returned) {
+        if (!arr.counts || !arr.counts.returned) {
             arr.counts.returned = 0;
             arr.counts.requests = 0;
         }
