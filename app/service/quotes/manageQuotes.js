@@ -45,7 +45,7 @@ function addByType(msg, match, type) {
         if (!match[4]) {
             quote = type;
         }
-        console.log(msg)
+        // console.log(msg)
         if (msg.reply_to_message.sticker) {
             quote += " " + msg.reply_to_message.sticker.emoji;
         }

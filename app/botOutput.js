@@ -28,7 +28,7 @@ function sendQuote(msg, quote, message) {
         return;
     }
 
-    if(quote.type != 'text'){
+    if(quote.type && quote.type != 'text'){
         sendFileType(msg, quote);
         return;
     }
