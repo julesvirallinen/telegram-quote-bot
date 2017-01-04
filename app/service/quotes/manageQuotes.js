@@ -19,13 +19,13 @@ function add(msg, match) {
             return;
         }
 
-        if(msg.reply_to_message.voice){
-            addByType(msg, match,  'voice');
+        if (msg.reply_to_message.voice) {
+            addByType(msg, match, 'voice');
             return;
         }
 
-        if(msg.reply_to_message.audio){
-            addByType(msg, match,  'audio');
+        if (msg.reply_to_message.audio) {
+            addByType(msg, match, 'audio');
             return;
         }
 
@@ -40,10 +40,14 @@ function add(msg, match) {
 }
 
 function addByType(msg, match, type) {
-    if(msg.reply_to_message[type]){
+    if (msg.reply_to_message[type]) {
         var quote = match[4];
         if (!match[4]) {
             quote = type;
+        }
+        console.log(msg)
+        if (msg.reply_to_message.sticker) {
+            quote += " " + msg.reply_to_message.sticker.emoji;
         }
         addQuote(msg.from.id, msg, quote, type, msg.reply_to_message[type].file_id);
         return;
@@ -64,7 +68,7 @@ function addQuote(addedBy, msg, toAdd, type, resourceId) {
         }
         groupId = group._id;
 
-        if(!type){
+        if (!type) {
             type = "text";
         }
 
@@ -79,9 +83,6 @@ function addQuote(addedBy, msg, toAdd, type, resourceId) {
                 downVotes: 0
             }
         });
-
-
-
 
 
         newQuote.save(function (err, quote) {
@@ -116,17 +117,16 @@ function delQuote(msg, match, idBool) {
         var re = new RegExp(match[3], "i");
 
         db.Quote.find({quote: re}, function (err, quote) {
-            if(quote.length>1){
+            if (quote.length > 1) {
                 botOutput.sendMessage(msg, "found " + quote.length + " quotes, did nothing.");
                 findQuote(msg, match);
             }
-            if(quote.length==1){
+            if (quote.length == 1) {
                 var text = "*deleted quote*: " + quote[0].quote;
-                db.Quote.findByIdAndRemove(quote[0]._id, function(err) {
+                db.Quote.findByIdAndRemove(quote[0]._id, function (err) {
                     botOutput.sendMessage(msg, text);
 
                 })
-
 
 
             } else {
