@@ -8,6 +8,8 @@ var Schema = mongoose.Schema;
 
 var quotesSchema = new Schema({
     quote: String,
+    type: String,
+    resourceId: String,
     index: Number,
     // addedBy: {type: Schema.ObjectId, ref: 'User'},
     group: {

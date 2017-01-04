@@ -15,13 +15,20 @@ function add(msg, match) {
         }
 
         if (msg.reply_to_message.sticker) {
-            var syntax = "sti!:" + msg.reply_to_message.sticker.file_id;
-            if (match[4]) {
-                syntax += "(" + match[4] + " )";
-            }
-            addQuote(msg.from.id, msg, syntax);
+            addByType(msg, match, 'sticker');
             return;
         }
+
+        if(msg.reply_to_message.voice){
+            addByType(msg, match,  'voice');
+            return;
+        }
+
+        if(msg.reply_to_message.audio){
+            addByType(msg, match,  'audio');
+            return;
+        }
+
     }
 
     if (match[4] == undefined) {
@@ -32,8 +39,20 @@ function add(msg, match) {
 
 }
 
+function addByType(msg, match, type) {
+    if(msg.reply_to_message[type]){
+        var quote = match[4];
+        if (!match[4]) {
+            quote = type;
+        }
+        addQuote(msg.from.id, msg, quote, type, msg.reply_to_message[type].file_id);
+        return;
 
-function addQuote(addedBy, msg, toAdd) {
+    }
+}
+
+
+function addQuote(addedBy, msg, toAdd, type, resourceId) {
     var chatId = msg.chat.id;
 
     var groupId = 0;
@@ -45,15 +64,25 @@ function addQuote(addedBy, msg, toAdd) {
         }
         groupId = group._id;
 
+        if(!type){
+            type = "text";
+        }
+
         var newQuote = db.Quote({
             quote: toAdd,
             addedBy: addedBy,
             group: groupId,
+            type: type,
+            resourceId: resourceId,
             votes: {
                 upVotes: 0,
                 downVotes: 0
             }
         });
+
+
+
+
 
         newQuote.save(function (err, quote) {
             if (quote) {

@@ -8,8 +8,7 @@ var moment = require('moment');
 moment().format();
 
 
-
-function sendMessage(msg, message){
+function sendMessage(msg, message) {
     var options = {
         parse_mode: "Markdown"
     };
@@ -17,37 +16,87 @@ function sendMessage(msg, message){
     bot.sendMessage(msg.chat.id, parseMessage(msg, message), options);
 }
 
-function sendQuote(msg, quote, message){
-    if(message){
+function sendQuote(msg, quote, message) {
+    if (message) {
         quoteSender(msg, message + quote.quote);
         return;
     }
+
+
+    if ((quote.quote.length > 7 && quote.quote.substr(0, 5) == 'sti!:') || quote.type && quote.type == 'sticker') {
+        sendSticker(msg, quote);
+        return;
+    }
+
+    if(quote.type != 'text'){
+        sendFileType(msg, quote);
+        return;
+    }
+
+
     quoteSender(msg, quote.quote, quote._id);
 }
 
 function quoteSender(msg, message, quoteId) {
     var chatId = msg.chat.id;
-    if (message.length > 7 && message.substr(0, 5) == 'sti!:') {
-        console.log(message)
-        var stickerId = message.split(':')[1].split('(')[0];
-
-        try {
-            console.log(stickerId)
-            bot.sendSticker(chatId, stickerId);
-        } catch (err) {
-            console.log("invalid sticker syntax " + err)
-
-    }
-        return;
-    }
-
-    var options = {
-        parse_mode: "Markdown"
-    };
 
     message = parseMessage(msg, message);
 
-    if (quoteId) {
+    options = getOptions(quoteId);
+
+    bot.sendMessage(chatId, message, options);
+
+}
+
+function sendFileType(msg, quote) {
+    var chatId = msg.chat.id;
+    var options = getOptions(quote._id);
+
+    if(quote.type == 'voice'){
+        bot.sendVoice(chatId, quote.resourceId, options);
+        return;
+    }
+
+    if(quote.type == 'audio'){
+        bot.sendAudio(chatId, quote.resourceId, options);
+        return;
+    }
+
+
+
+}
+
+function sendSticker(msg, quote) {
+    var chatId = msg.chat.id;
+    var options = getOptions(quote._id);
+
+    console.log(quote);
+    var message = quote.quote;
+    // FOR DEPRECATED STICKER SYNTAX, YEAH ILL DEAL WITH IT LATER
+    if (quote.quote.substr(0, 5) == 'sti!:') {
+        var stickerId = quote.quote.split(':')[1].split('(')[0];
+        try {
+            console.log(stickerId);
+            bot.sendSticker(chatId, stickerId, options);
+        } catch (err) {
+            console.log("invalid sticker syntax " + err)
+        }
+        return;
+    }
+    if (quote.type == 'sticker') {
+        bot.sendSticker(chatId, quote.resourceId, options);
+    }
+
+}
+
+function getOptions(quoteId) {
+    if (!quoteId) {
+        var options = {
+            parse_mode: "Markdown"
+        };
+    } else {
+
+
         var options = {
             reply_markup: JSON.stringify({
                 inline_keyboard: [[
@@ -59,18 +108,11 @@ function quoteSender(msg, message, quoteId) {
             parse_mode: "Markdown"
 
         };
-        bot.sendMessage(chatId, message, options);
-        return;
     }
-
-
-
-    bot.sendMessage(chatId, message, options);
-
-
+    return options;
 }
 
-function parseMessage(msg, message){
+function parseMessage(msg, message) {
     if (message == process.env.OLLI1) {
         message = process.env.OLLI2;
     }
@@ -82,11 +124,10 @@ function parseMessage(msg, message){
     return message;
 }
 
-String.prototype.replaceAll = function(search, replacement) {
+String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.split(search).join(replacement);
 };
-
 
 
 module.exports = {

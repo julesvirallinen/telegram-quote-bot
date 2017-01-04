@@ -114,7 +114,6 @@ function imFeelingLucky(msg) {
 
 
 function voteCallback(callbackQuery) {
-    //this seems to be missing a row or two... i'll have to find it...
     var parts = callbackQuery.data.split('|');
     if (parts[0] == '+' || parts[0] == '-') {
         db.Quote.findById(parts[1], function (err, quote) {
@@ -136,7 +135,7 @@ function voteCallback(callbackQuery) {
         chat_id: callbackQuery.message.chat.id,
         message_id: callbackQuery.message.message_id
     };
-    bot.editMessageText(callbackQuery.message.text, options);
+    bot.editMessageReplyMarkup({parse_mode: "Markdown"}, options);
 
 
 }
