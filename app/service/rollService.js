@@ -1,7 +1,7 @@
 /**
  * Created by julkku on 12/25/16.
  */
-var botOutput = require('../botOutput');
+var botOutput = require('../bot/botOutput');
 
 function roll(msg, match){
     var input = match[4];

@@ -3,7 +3,7 @@ var TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
 var bot = new TelegramBot(process.env.API_TOKEN);
 var config = require('../../config');
-var botOutput = require('../../botOutput');
+var botOutput = require('../../bot/botOutput');
 
 function add(msg, match) {
     var chatId = msg.chat.id;

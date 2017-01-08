@@ -4,7 +4,7 @@
 var db = require('./../../schemas');
 require('dotenv').config();
 var config = require('../../config');
-var botOutput = require('../../botOutput');
+var botOutput = require('../../bot/botOutput');
 
 
 

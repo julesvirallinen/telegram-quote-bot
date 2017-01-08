@@ -1,8 +1,8 @@
-var db = require('./schemas');
+var db = require('./../schemas');
 var TelegramBot = require('node-telegram-bot-api');
 require('dotenv').config();
 var bot = new TelegramBot(process.env.API_TOKEN);
-var config = require('./config');
+var config = require('./../config');
 
 var moment = require('moment');
 moment().format();
