@@ -27,10 +27,10 @@ bot.onText(/\/(sleep(\@puppy2_bot)?)/, function (msg, match) {
 bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
     quoteFinder.quote(msg, match);
 });
-
-bot.onText(/((?!)|(@puppy2_bot?( (.+)|\0{0})))/), function (msg, match) {
-    quoteFinder.quote(msg, match);
-});
+//
+// bot.onText(/((?!)|(@puppy2_bot?( (.+)|\0{0})))/), function (msg, match) {
+//     quoteFinder.quote(msg, match);
+// });
 
 bot.onText(/\/(q(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
     quoteFinder.quote(msg, match);
