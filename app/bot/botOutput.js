@@ -70,7 +70,6 @@ function sendSticker(msg, quote) {
     var chatId = msg.chat.id;
     var options = getOptions(quote._id);
 
-    console.log(quote);
     var message = quote.quote;
     // FOR DEPRECATED STICKER SYNTAX, YEAH ILL DEAL WITH IT LATER
     if (quote.quote.substr(0, 5) == 'sti!:') {

@@ -6,7 +6,6 @@ var config = require('../../config');
 var botOutput = require('../../bot/botOutput');
 
 
-
 function sleep(msg) {
     var chatId = msg.chat.id;
 
@@ -126,7 +125,7 @@ function voteCallback(callbackQuery) {
                     console.log(quote.votes);
                 });
                 // bot.answerCallbackQuery(callbackQuery.id, ":D");
-             }
+            }
         });
 
 
@@ -147,10 +146,20 @@ function escape(text) {
 
 function getQuoteForGroup(msg, group_id, search) {
     search = search.replace(/\[a\]/g, "").trim();
-
     var re = new RegExp(escape(search.trim()), "i");
 
-    db.Quote.findRandom({group: group_id, quote: re}, function (err, quote) {
+    var quality = Math.random();
+    // I can add search terms relating to quality below, atm the only this is 50 / 50 -
+    // half of the time puppy only gives a quote with no downvotes.
+    // This is pretty fucking heavy on the server, so :D
+
+    var options = {up: "obj.votes.upVotes > 3", downvotes: "obj.votes.downVotes == 0", nothing: "true"};
+    var search = "true";
+
+    if (quality > 0.5) search = options.downvotes;
+    console.log("searching for quote with term: " + re + "and quality control as " + search);
+
+    db.Quote.findRandom({group: group_id, quote: re, $where: options.nothing}, function (err, quote) {
         if (quote[0]) {
             botOutput.sendQuote(msg, quote[0]);
         } else {
@@ -171,8 +180,6 @@ function sentTotallyRandom(msg) {
     });
 
 }
-
-
 
 
 module.exports = {
