@@ -153,13 +153,28 @@ function getQuoteForGroup(msg, group_id, search) {
     // half of the time puppy only gives a quote with no downvotes.
     // This is pretty fucking heavy on the server, so :D
 
-    var options = {up: "obj.votes.upVotes > 3", downvotes: "obj.votes.downVotes == 0", nothing: "true"};
-    var search = "true";
 
-    if (quality > 0.5) search = options.downvotes;
-    console.log("searching for quote with term: " + re + "and quality control as " + search);
+    var terms = {
+        up: "obj.votes.upVotes > 3",
+        downvotes: "obj.votes.downVotes == 0",
+        nothing: "true",
+        question: "obj.quote.length<50"
+    };
 
-    db.Quote.findRandom({group: group_id, quote: re, $where: options.nothing}, function (err, quote) {
+    var options = {group: group_id, quote: re};
+
+    if (search.indexOf('?') != -1) {
+        re = new RegExp(escape('.'), "i");
+
+        options.quote = re;
+        options.$where = terms.question;
+    }
+
+
+    // console.log("searching for quote with term: " + re + "and quality control as " + search);
+    console.log(search.indexOf("?"), options);
+
+    db.Quote.findRandom(options, function (err, quote) {
         if (quote[0]) {
             botOutput.sendQuote(msg, quote[0]);
         } else {
