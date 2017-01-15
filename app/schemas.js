@@ -8,12 +8,18 @@ var Schema = mongoose.Schema;
 
 var quotesSchema = new Schema({
     quote: String,
+    type: String,
+    resourceId: String,
     index: Number,
     // addedBy: {type: Schema.ObjectId, ref: 'User'},
     group: {
-        type: Schema.ObjectId, ref: 'Group',
+        type: Schema.ObjectId, ref: 'Group'
     },
-    rating: {type: Number, default: 1}
+    rating: {type: Number, default: 1},
+    votes : {
+        upVotes: {type:Number, default: 0},
+        downVotes: {type:Number, default: 0}
+    }
 
 });
 
@@ -22,8 +28,15 @@ var groupsSchema = new Schema({
     // quotes: [{type: Schema.ObjectId, ref: 'Quote'}],
     users: [{userId: String, lastQuote: Number}],
     lastQuote: {type: Number, default: 0},
-    lastRequestBy: {type: Number, default: 0}
-    // lastQuoteIndex: Number
+    lastRequestBy: {type: Number, default: 0},
+    config: {
+        sleepLength: Number,
+        quoteBuffer: Number
+    },
+    counts : {
+        requests: {type: Number, default: 0},
+        returned: {type: Number, default: 0}
+    }
 });
 
 // var userSchema = new Schema({
