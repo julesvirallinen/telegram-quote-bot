@@ -32,7 +32,7 @@ function quote(msg, match) {
     var chatId = msg.chat.id;
     db.Group.findOne({chatId: chatId}, function (err, arr) {
         if (!arr) {
-            console.log(" quoteservice / quote(): no groups matched, terminating.")
+            console.log(" quoteservice / quote(): no groups matched, terminating.");
             return;
         }
 
@@ -54,7 +54,7 @@ function quote(msg, match) {
                 getQuoteForGroup(msg, arr._id, match[4]);
             }
 
-            // Sets time for previous quote and saves group. 
+            // Sets time for previous quote and saves group.
             arr.lastQuote = d.getTime();
             arr.lastRequestBy = msg.from.id;
 
@@ -146,7 +146,7 @@ function getQuoteForGroup(msg, group_id, search) {
     // I can add search terms relating to quality below, atm the only this is 50 / 50 -
     // half of the time puppy only gives a quote with no downvotes.
     // This is pretty fucking heavy on the server, so :D
-    
+
 
     var terms = {
         up: "obj.votes.upVotes > 3",
@@ -199,6 +199,6 @@ module.exports = {
     quote: quote,
     imFeelingLucky: imFeelingLucky,
     voteCallback: voteCallback,
-}
+};
 
 
