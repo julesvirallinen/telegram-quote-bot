@@ -48,15 +48,8 @@ function quote(msg, match) {
 
             //sometimes sends quote from entire pool of quotes. 
             if (match[4] == undefined) {
-                if (Math.random() < 0.005) {
-                    sentTotallyRandom(msg);
-                    return;
-                }
-
                 getQuoteForGroup(msg, arr._id, '.');
-
             } else {
-
                 console.log("searching for: " + match[4]);
                 getQuoteForGroup(msg, arr._id, match[4]);
             }
@@ -79,23 +72,24 @@ function quote(msg, match) {
 
 }
 
-function imFeelingLucky(msg) {
+function imFeelingLucky(msg, match) {
     var chatId = msg.chat.id;
 
     db.Group.findOne({chatId: chatId}, function (err, arr) {
 
 
         var d = new Date();
-        if (d.getTime() - arr.lastQuote < 10000) {
+        if (msg.from.id != process.env.JULIUS && d.getTime() - arr.lastQuote < config.spamSec * 1000) {
             console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
-            return;
-            // if (arr.lastRequestBy == msg.from.id && msg.chat.type != 'private') {
-            //     console.log("blocked for spam from person");
-            //     return;
-            // }
         } else {
-            sentTotallyRandom(msg);
 
+            //sometimes sends quote from entire pool of quotes.
+            if (match[4] == undefined) {
+                getQuoteForGroup(msg, false, '.');
+            } else {
+                console.log("searching for: " + match[4]);
+                getQuoteForGroup(msg, false, match[4]);
+            }
             arr.lastQuote = d.getTime();
             arr.lastRequestBy = msg.from.id;
             // arr.counts.returned = 1;
@@ -161,13 +155,17 @@ function getQuoteForGroup(msg, group_id, search) {
         question: "obj.quote.length<50"
     };
 
-    var options = {group: group_id, quote: re};
+    var options = {quote: re};
 
     if (search.indexOf('?') != -1) {
         re = new RegExp(escape('.'), "i");
 
         options.quote = re;
         options.$where = terms.question;
+    }
+
+    if(group_id){
+        options.group = group_id;
     }
 
 
