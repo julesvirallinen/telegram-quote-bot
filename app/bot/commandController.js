@@ -28,17 +28,6 @@ bot.onText(/\/(quote(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
     quoteFinder.quote(msg, match);
 });
 
-<<<<<<< HEAD
-bot.onText(/\/(imfeelinglucky(\@puppy2_bot)?)/, function (msg, match) {
-    quoteFinder.imFeelingLucky(msg);
-});
-
-bot.onText(/\/(lucky(\@puppy2_bot)?)( (.+)|\0{0})/, function (msg, match) {
-    quoteFinder.imFeelingLucky(msg, match);
-});
-
-=======
->>>>>>> heroku/master
 bot.onText(/((?!)|(^@puppy2_bot?( (.+)|\0{0})))/, function (msg, match) {
     quoteFinder.quote(msg, match);
 });
@@ -47,14 +36,9 @@ bot.onText(/((?!)|(^@puppy2_bot?( (.+)|\0{0})))/, function (msg, match) {
 //     quoteFinder.quote(msg, match);
 // });
 
-
-<<<<<<< HEAD
-
-=======
 bot.onText(/\/(imfeelinglucky(\@puppy2_bot)?)/, function (msg, match) {
     quoteFinder.imFeelingLucky(msg);
 });
->>>>>>> heroku/master
 
 // QUOTEMANAGER
 // ____________

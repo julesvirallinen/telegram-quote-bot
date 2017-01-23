@@ -159,18 +159,30 @@ function getQuoteForGroup(msg, group_id, search) {
 
     if (search.indexOf('?') != -1) {
         re = new RegExp(escape('.'), "i");
-
         options.quote = re;
         options.$where = terms.question;
+    } else if (search == '.') {
+        var rand = Math.random();
+        var quality = 0;
+        if (rand < 0.2) {
+            quality = -3;
+        } else if (rand < 0.4){
+            quality = 0;
+        } else if (rand < 0.6){
+            quality = 1;
+        } else if (rand < 0.8) {
+            quality = 3;
+        } else if (rand < 0.95) {
+            quality = 4;
+        }
+        options.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
     }
 
-    if(group_id){
+    console.log(options);
+
+    if (group_id) {
         options.group = group_id;
     }
-
-
-    // console.log("searching for quote with term: " + re + "and quality control as " + search);
-    console.log(search.indexOf("?"), options);
 
     db.Quote.findRandom(options, function (err, quote) {
         if (quote[0]) {

@@ -4,8 +4,10 @@ require('dotenv').config();
 var bot = new TelegramBot(process.env.API_TOKEN);
 var config = require('./../config');
 
+/*
 var moment = require('moment');
 moment().format();
+*/
 
 
 function sendMessage(msg, message) {
