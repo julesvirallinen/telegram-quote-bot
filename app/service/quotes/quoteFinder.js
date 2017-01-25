@@ -165,13 +165,13 @@ function getQuoteForGroup(msg, group_id, search) {
         var quality = 0;
         if (rand < 0.2) {
             quality = -3;
-        } else if (rand < 0.4){
-            quality = 0;
         } else if (rand < 0.6){
+            quality = 0;
+        } else if (rand < 0.8){
             quality = 1;
-        } else if (rand < 0.8) {
+        } else if (rand < 0.9) {
             quality = 3;
-        } else if (rand < 0.95) {
+        } else if (rand < 1) {
             quality = 4;
         }
         options.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
