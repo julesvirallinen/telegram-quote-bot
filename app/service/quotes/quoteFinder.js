@@ -83,13 +83,12 @@ function imFeelingLucky(msg, match) {
             console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
         } else {
 
-            //sometimes sends quote from entire pool of quotes.
-            if (match[4] == undefined) {
+            // if (match[4] == undefined) {
                 getQuoteForGroup(msg, false, '.');
-            } else {
-                console.log("searching for: " + match[4]);
-                getQuoteForGroup(msg, false, match[4]);
-            }
+            // } else {
+            //     console.log("searching for: " + match[4]);
+            //     getQuoteForGroup(msg, false, match[4]);
+            // }
             arr.lastQuote = d.getTime();
             arr.lastRequestBy = msg.from.id;
             // arr.counts.returned = 1;
