@@ -10,6 +10,9 @@ var botOutput = require('../../bot/botOutput');
 
 
 function start(msg) {
+    if(!msg){
+        return;
+    }
     var chatId = msg.chat.id;
 
     db.Group.findOne({chatId: chatId}, function (err, group) {
