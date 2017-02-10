@@ -4,7 +4,7 @@
   "description": "A new version of puppy for a new generation.",
   "author": "Julkku",
   "engines": {
-    "node": "4.6.0"
+    "node": "6.9.5"
   },
   "dependencies": {
     "body-parser": "~1.15.2",
