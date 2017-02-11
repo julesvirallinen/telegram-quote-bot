@@ -46,7 +46,6 @@ function quote(msg, match) {
             console.log("Blocked for spam! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
         } else {
 
-            //sometimes sends quote from entire pool of quotes. 
             if (match[4] == undefined) {
                 getQuoteForGroup(msg, arr._id, '.');
             } else {
@@ -141,12 +140,6 @@ function getQuoteForGroup(msg, group_id, search) {
     search = search.replace(/\[a\]/g, "").trim();
     var re = new RegExp(escape(search.trim()), "i");
 
-    var quality = Math.random();
-    // I can add search terms relating to quality below, atm the only this is 50 / 50 -
-    // half of the time puppy only gives a quote with no downvotes.
-    // This is pretty fucking heavy on the server, so :D
-
-
     var terms = {
         up: "obj.votes.upVotes > 3",
         downvotes: "obj.votes.downVotes == 0",
@@ -154,13 +147,11 @@ function getQuoteForGroup(msg, group_id, search) {
         question: "obj.quote.length<50"
     };
 
-    var options = {quote: re};
+    var filter = {quote: re};
 
-    if (search.indexOf('?') != -1) {
-        re = new RegExp(escape('.'), "i");
-        options.quote = re;
-        options.$where = terms.question;
-    } else if (search == '.') {
+        if (search == '.' || search.indexOf('?') != -1) {
+        // options.quote = new RegExp('.');
+
         var rand = Math.random();
         var quality = 0;
         if (rand < 0.2) {
@@ -174,18 +165,24 @@ function getQuoteForGroup(msg, group_id, search) {
         } else if (rand < 1) {
             quality = 4;
         }
-        options.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
+        filter.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
     }
 
-    console.log(options);
+    if (search.indexOf('?') != -1) {
+        filter.quote = new RegExp('.');
+        filter.$where +=  " && " + terms.question;
+    }
 
     if (group_id) {
-        options.group = group_id;
+        filter.group = group_id;
     }
 
-    db.Quote.findRandom(options, function (err, quote) {
+    console.log(filter)
+
+    db.Quote.findRandom(filter, function (err, quote) {
         if (quote[0]) {
             botOutput.sendQuote(msg, quote[0]);
+            return;
         } else {
             getQuoteForGroup(msg, group_id, '.');
             // I hope this never loops and kills everything...

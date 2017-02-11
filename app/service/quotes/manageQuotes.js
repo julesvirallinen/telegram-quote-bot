@@ -37,7 +37,7 @@ function add(msg, match) {
 
     addQuote(msg.from.id, msg, match[4]);
 
-}
+};
 
 function addByType(msg, match, type) {
     if (msg.reply_to_message[type]) {
@@ -53,7 +53,7 @@ function addByType(msg, match, type) {
         return;
 
     }
-}
+};
 
 
 function addQuote(addedBy, msg, toAdd, type, resourceId) {
@@ -86,12 +86,18 @@ function addQuote(addedBy, msg, toAdd, type, resourceId) {
 
 
         newQuote.save(function (err, quote) {
+            function loadData(err, data) {
+                if (err) {
+                    console.log(err.stack);
+                    return;
+                }
+            }
+
             if (quote) {
                 // quoteId = quote._id;
                 // bot.sendMessage(chatId, "Saved quote: " + quote.quote, quote._id);
                 botOutput.sendQuote(msg, quote, ":user: added quote: ");
             } else {
-                console.log(err);
                 bot.sendMessage(chatId, "lol no");
 
             }
@@ -101,7 +107,7 @@ function addQuote(addedBy, msg, toAdd, type, resourceId) {
 
 function delQuote(msg, match, idBool) {
     var chatId = msg.chat.id;
-    if (msg.from.id != process.env.JULIUS) {
+    if (msg.from.id !== process.env.JULIUS) {
         return;
     }
     if (idBool) {
@@ -117,11 +123,15 @@ function delQuote(msg, match, idBool) {
         var re = new RegExp(match[3], "i");
 
         db.Quote.find({quote: re}, function (err, quote) {
+            if (err) {
+                console.log(err.stack);
+                return;
+            }
             if (quote.length > 1) {
                 botOutput.sendMessage(msg, "found " + quote.length + " quotes, did nothing.");
                 findQuote(msg, match);
             }
-            if (quote.length == 1) {
+            if (quote.length === 1) {
                 var text = "*deleted quote*: " + quote[0].quote;
                 db.Quote.findByIdAndRemove(quote[0]._id, function (err) {
                     botOutput.sendMessage(msg, text);
@@ -152,11 +162,11 @@ function findQuote(msg, match) {
             }
         }
     });
-}
+};
 
 
 module.exports = {
     add: add,
     findQuote: findQuote,
-    delQuote: delQuote,
-}
+    delQuote: delQuote
+};
