@@ -2,6 +2,7 @@ require('dotenv').config();
 
 var mongoose = require('mongoose');
 var url = process.env.MONGOLAB_URL || 'mongodb://localhost/quotes';
+mongoose.Promise = global.Promise;
 mongoose.connect(url);
 
 process.on('uncaughtException', function (err) {

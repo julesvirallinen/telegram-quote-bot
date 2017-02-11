@@ -11,7 +11,6 @@ var quotesSchema = new Schema({
     type: String,
     resourceId: String,
     index: Number,
-    // addedBy: {type: Schema.ObjectId, ref: 'User'},
     group: {
         type: Schema.ObjectId, ref: 'Group'
     },
@@ -39,21 +38,10 @@ var groupsSchema = new Schema({
     }
 });
 
-// var userSchema = new Schema({
-//     userId: {type: String, unique: true},
-//     name: String,
-//     lastQuote: Number,
-//     quotesAdded: Number,
-//     banned: Boolean
-// })
-
-// quotesSchema.index({ quote: 1});
 quotesSchema.plugin(random);
 
 var Quote = mongoose.model('Quote', quotesSchema),
-    // User = mongoose.model('User', userSchema),
     Group = mongoose.model('Group', groupsSchema);
 
 module.exports.Quote = Quote;
-// module.exports.User = User;
 module.exports.Group = Group;

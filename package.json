@@ -26,6 +26,7 @@
     "morgan": "~1.7.0",
     "node-cron": "*",
     "node-telegram-bot-api": "^0.25.0",
+    "promise": "^7.1.1",
     "request": "*",
     "serve-favicon": "~2.3.0"
   }
