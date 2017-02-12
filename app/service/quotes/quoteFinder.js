@@ -64,11 +64,7 @@ function quote(msg, match) {
                 getQuoteForGroup(msg, arr._id, '.');
             } else {
                 console.log("searching for: " + match[4]);
-                getQuoteForGroup(msg, arr._id, match[4], function(bool){
-                    if(!bool){
-                        console.log("no quote found")
-                    }
-                });
+                getQuoteForGroup(msg, arr._id, match[4]);
 
             }
 
@@ -177,8 +173,8 @@ function getQuoteForGroup(msg, group_id, search, fn) {
     // search = search.replace(/\[a\]/g, "").trim();
     var re = new RegExp(escape(search.trim()), "i");
 
-    var fields = {quote: re, group: group_id};
-    var filter = {};
+    var query = {quote: re, group: group_id};
+    // var filter = {$where : "true"};
 
 
     if (search == '.' || search.indexOf('?') != -1) {
@@ -203,22 +199,52 @@ function getQuoteForGroup(msg, group_id, search, fn) {
         } else if (rand < 1) {
             quality = 4;
         }
-        filter.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
+        query.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
 
         if (search.indexOf('?') != -1) {
-            fields.quote = new RegExp('.');
-            filter.$where += " && " + terms.question;
+            // fields.quote = new RegExp('.');
+            query.$where += " && " + terms.question;
         }
     }
-    db.Quote.findOneRandom(fields, filter, function (err, result) {
-        if (err) {
-            console.log(err.stack);
-            return;
-        }
-        if (result) {
-            botOutput.sendQuote(msg, result);
-        }
+    var filter = {group: group_id, quote: re};
+
+    db.Quote.count().exec(function (err, count) {
+
+        var random = Math.floor(Math.random() * count);
+
+        db.Quote.findOne(filter).skip(random).exec(
+            function (err, result) {
+                if (err) {
+                    console.log(err.stack);
+                    return;
+                }
+                if (result) {
+                    botOutput.sendQuote(msg, result);
+                } else {
+                    getQuoteForGroup(msg, group_id, '.');
+                }
+                // result is random
+
+            });
+
     });
+
+
+    // db.Quote.findRandom(filter, function (err, result) {
+    //     // console.log(err, result);
+    //     if(!result){
+    //         console.log("DID IT!!!")
+    //     } else console.log("found something...");
+    //     if (err) {
+    //         console.log(err.stack);
+    //         return;
+    //     }
+    //     if (result) {
+    //         botOutput.sendQuote(msg, result);
+    //     } else {
+    //         getQuoteForGroup(msg, group_id, '.');
+    //     }
+    // });
 }
 
 function sentTotallyRandom(msg) {

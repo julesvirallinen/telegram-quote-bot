@@ -5,6 +5,10 @@ var url = process.env.MONGOLAB_URL || 'mongodb://localhost/quotes';
 mongoose.Promise = global.Promise;
 mongoose.connect(url);
 
+mongoose.connection.on('error', function(err) {
+    console.error('MongoDB error: %s', err);
+});
+
 process.on('uncaughtException', function (err) {
     console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
     console.error(err.stack)
