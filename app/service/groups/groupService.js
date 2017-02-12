@@ -18,7 +18,7 @@ function start(msg) {
     db.Group.findOne({chatId: chatId}, function (err, group) {
         if (!group) {
 
-            addGroup(chatId);
+            addGroup(msg);
             return;
         }
 
@@ -30,8 +30,6 @@ function start(msg) {
 
 function addGroup(msg) {
     var chatId = msg.chat.id;
-
-    // console.log(msg);
 
     var newGroup = db.Group({
         chatId: chatId,

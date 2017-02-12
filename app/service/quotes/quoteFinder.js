@@ -173,12 +173,11 @@ function getQuoteForGroup(msg, group_id, search, fn) {
     // search = search.replace(/\[a\]/g, "").trim();
     var re = new RegExp(escape(search.trim()), "i");
 
-    var query = {quote: re, group: group_id};
-    // var filter = {$where : "true"};
+    var filter = {group: group_id, quote: re};
 
 
     if (search == '.' || search.indexOf('?') != -1) {
-        // options.quote = new RegExp('.');
+        filter.quote = new RegExp('.', "i");
         var terms = {
             up: "obj.votes.upVotes > 3",
             downvotes: "obj.votes.downVotes == 0",
@@ -199,19 +198,16 @@ function getQuoteForGroup(msg, group_id, search, fn) {
         } else if (rand < 1) {
             quality = 4;
         }
-        query.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
+        filter.$where = "obj.votes.downVotes + obj.votes.upVotes >= " + quality;
 
         if (search.indexOf('?') != -1) {
             // fields.quote = new RegExp('.');
-            query.$where += " && " + terms.question;
+            filter.$where += " && " + terms.question;
         }
     }
-    var filter = {group: group_id, quote: re};
-
-    db.Quote.count().exec(function (err, count) {
-
+    console.log(filter)
+    db.Quote.count(filter).exec(function (err, count) {
         var random = Math.floor(Math.random() * count);
-
         db.Quote.findOne(filter).skip(random).exec(
             function (err, result) {
                 if (err) {
