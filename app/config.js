@@ -20,4 +20,8 @@ config.rate.solid = 0.1;
 config.spamSec = 20;
 config.sleepTime = 200;
 
+config.api = {};
+config.api.enabled = process.env.API_ENABLED;
+config.api.port = process.env.API_PORT ? parseInt(process.env.API_PORT) : 1234;
+
 module.exports = config;

@@ -19,6 +19,7 @@ process.on('uncaughtException', function (err) {
 
 
 require('./app/bot/commandController');
+require('./app/api/api');
 // require('./app/service/timeService');
 
 
