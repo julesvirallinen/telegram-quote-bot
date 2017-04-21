@@ -64,6 +64,11 @@ function sendFileType(msg, quote) {
         return;
     }
 
+    if(quote.type == 'photo'){
+        bot.sendPhoto(chatId, quote.resourceId, options);
+        return;
+    }
+
 
 
 }
@@ -106,8 +111,8 @@ function getOptions(quoteId) {
                     {text: "❌", callback_data: '0'}
                 ]]
             }),
-            parse_mode: "Markdown"
-
+            parse_mode: "Markdown",
+            disable_web_page_preview: true
         };
     }
     return options;
