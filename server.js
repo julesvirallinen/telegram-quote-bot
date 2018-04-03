@@ -24,3 +24,10 @@ require('./app/api/api');
 
 
 
+process.on('SIGINT', function() {
+   db.stop(function(err) {
+     process.exit(err ? 1 : 0);
+   });
+});
+
+
