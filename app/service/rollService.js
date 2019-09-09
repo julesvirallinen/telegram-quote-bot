@@ -9,7 +9,6 @@ function roll(msg, match){
     if(!isNaN(match[4])){
         var output = 0;
         length = input.toString().length;
-        console.log(length);
         if (input > 0){
             output = randomIntFromInterval(1, input);
         }

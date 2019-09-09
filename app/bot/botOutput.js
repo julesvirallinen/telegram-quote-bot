@@ -82,7 +82,7 @@ function sendSticker(msg, quote) {
     if (quote.quote.substr(0, 5) == 'sti!:') {
         var stickerId = quote.quote.split(':')[1].split('(')[0];
         try {
-            console.log(stickerId);
+            // console.log(stickerId);
             bot.sendSticker(chatId, stickerId, options);
         } catch (err) {
             console.log("invalid sticker syntax " + err)
@@ -140,4 +140,3 @@ module.exports = {
     sendMessage: sendMessage,
     sendQuote: sendQuote
 };
-

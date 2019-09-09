@@ -46,14 +46,12 @@ function addGroup(msg) {
 
 function stats(msg) {
     var chatId = msg.chat.id;
-    console.log("made it to stats!")
-
 
 
     db.Group.findOne({chatId: chatId}, function (err, arr) {
         var d = new Date();
         if (d.getTime() - arr.lastQuote < config.spamSec * 1000) {
-            console.log("Spam block! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
+            // console.log("Spam block! Time left: " + (-(d.getTime() - arr.lastQuote) / 1000));
             return;
         }
         db.Quote.count({group:arr._id}, function( err, count){
@@ -69,4 +67,3 @@ module.exports = {
     start: start,
     stats: stats
 };
-
