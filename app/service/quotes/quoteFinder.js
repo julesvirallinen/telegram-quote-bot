@@ -63,7 +63,7 @@ function quote(msg, match) {
             if (match[4] === undefined) {
                 getQuoteForGroup(msg, arr._id, '.');
             } else {
-                console.log("searching for: " + match[4]);
+                // console.log("searching for: " + match[4]);
                 getQuoteForGroup(msg, arr._id, match[4]);
 
             }
@@ -143,7 +143,7 @@ function voteCallback(callbackQuery) {
                         console.log(err.stack);
                         return;
                     }
-                    console.log(quote.votes);
+                    // console.log(quote.votes);
                 });
                 // bot.answerCallbackQuery(callbackQuery.id, ":D");
             }
@@ -205,7 +205,7 @@ function getQuoteForGroup(msg, group_id, search, fn) {
             filter.$where += " && " + terms.question;
         }
     }
-    console.log(filter)
+    // console.log(filter)
     db.Quote.count(filter).exec(function (err, count) {
         var random = Math.floor(Math.random() * count);
         db.Quote.findOne(filter).skip(random).exec(
