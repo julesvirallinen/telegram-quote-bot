@@ -119,9 +119,6 @@ function getOptions(quoteId) {
 }
 
 function parseMessage(msg, message) {
-    if (message == process.env.OLLI1) {
-        message = process.env.OLLI2;
-    }
     message = message.replaceAll(":user:", msg.from.first_name);
     if (msg.text && msg.text.indexOf("[a]") != -1) {
         message = message.split("");
